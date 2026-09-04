@@ -41,7 +41,7 @@ let fieldToken = 0;
 // ---------------------------------------------------------------- seeded place
 
 export function showPlace(place, stop){
-  fieldToken++;
+  const token = ++fieldToken;
   const entry = place.entries.find(e => stop.y >= e.from && stop.y < e.to)
              || place.entries[place.entries.length - 1];
 
@@ -49,8 +49,38 @@ export function showPlace(place, stop){
   el.title.textContent  = entry.title;
   el.sub.textContent    = place.subtitle;
   el.era.textContent    = eraChip(stop);
-  el.body.innerHTML     = entry.body + place.geology;
+  el.body.innerHTML     = `<div id="d-plates"></div>` + entry.body + place.geology;
   open();
+
+  // Seeded places get the same live plate strip as a field note — pulled from
+  // Wikipedia for the place's own centre, so nothing has to be hand-curated.
+  fillPlates(token, place.center[1], place.center[0]);
+}
+
+async function fillPlates(token, lat, lng){
+  let ground;
+  try { ground = await groundCoordinate(+lat.toFixed(2), +lng.toFixed(2)); }
+  catch { return; }
+  if (token !== fieldToken) return;
+  const box = el.body.querySelector('#d-plates');
+  if (!box || !ground.images?.length) return;
+  box.innerHTML = renderPlates(ground.images);
+}
+
+// Sepia plates, the way an atlas would bind them in.
+function renderPlates(images){
+  const shown = images.slice(0, 4);
+  if (!shown.length) return '';
+  return `<div class="plates">` +
+    shown.map(im => `
+      <figure class="plate">
+        ${im.url ? `<a href="${esc(im.url)}" target="_blank" rel="noopener">` : ''}
+          <img src="${esc(im.src)}" alt="${esc(im.title)}" loading="lazy">
+        ${im.url ? `</a>` : ''}
+        <figcaption>${esc(im.title)}</figcaption>
+      </figure>`).join('') +
+    `<div class="plates-src">Images: Wikipedia / Wikimedia Commons, nearest to this point.</div>
+   </div>`;
 }
 
 // ---------------------------------------------------------------- field note
@@ -173,9 +203,8 @@ function renderAI(box, html, model, cached){
 
 function renderGround(ground, here){
   const p = ground.primary;
-  let out = '';
+  let out = renderPlates(ground.images || []);
   if (p){
-    if (p.thumb) out += `<img class="fn-thumb" src="${esc(p.thumb)}" alt="">`;
     out += `<p class="fn-lead"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a>`;
     if (p.distM > 120) out += ` <span class="fn-dist">${formatKm(p.distM)} ${bearing(here, p.lngLat)}</span>`;
     out += `</p>`;

@@ -65,6 +65,41 @@ async function geosearch(lat, lng){
   }));
 }
 
+// One batched call gets a thumbnail (and canonical URL) for every nearby
+// article at once — much cheaper than a REST summary per article, and it is
+// what fills the plate strip in the panel.
+async function thumbsFor(articles){
+  const ids = articles.slice(0, 30).map(a => a.pageid);
+  if (!ids.length) return [];
+  let j;
+  try {
+    j = await getJSON(WP_API, {
+      action: 'query', prop: 'pageimages|info', inprop: 'url',
+      pageids: ids.join('|'), pithumbsize: 520, pilimit: 50,
+      format: 'json', origin: '*',
+    });
+  } catch { return []; }
+  const pages = j.query?.pages || {};
+  const out = [];
+  for (const a of articles){
+    const p = pages[a.pageid];
+    const t = p?.thumbnail;
+    if (!t?.source) continue;
+    // Skip flags, coats of arms and locator maps — they are almost never what
+    // the reader wants to see of a place.
+    if (/Flag_of|Coat_of_arms|\.svg$|locator|Location_/i.test(t.source)) continue;
+    out.push({
+      title: p.title || a.title,
+      src: t.source,
+      w: t.width, h: t.height,
+      url: p.fullurl || null,
+      distM: a.distM,
+    });
+    if (out.length >= 6) break;
+  }
+  return out;
+}
+
 async function summary(title){
   try {
     const j = await getJSON(WP_REST + encodeURIComponent(title.replace(/ /g, '_')));
@@ -159,7 +194,7 @@ export async function groundCoordinate(lat, lng){
 
   const articles = await geosearch(lat, lng);
   if (!articles.length){
-    const empty = { articles: [], primary: null, wikidata: null, coord: [lng, lat] };
+    const empty = { articles: [], primary: null, wikidata: null, images: [], coord: [lng, lat] };
     writeCache(key, empty);
     return empty;
   }
@@ -175,9 +210,12 @@ export async function groundCoordinate(lat, lng){
     }
   }
 
-  const wd = primary ? await wikidata(primary.qid) : null;
+  const [wd, images] = await Promise.all([
+    primary ? wikidata(primary.qid) : null,
+    thumbsFor(articles),
+  ]);
 
-  const out = { articles, primary, wikidata: wd, coord: [lng, lat] };
+  const out = { articles, primary, wikidata: wd, images, coord: [lng, lat] };
   writeCache(key, out);
   return out;
 }

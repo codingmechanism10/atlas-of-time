@@ -1,6 +1,7 @@
 // timeline.js — the scrubber.
 
 import { STOPS, BANDS, positionOf, nearestIndex, formatYear, bandFor, seaLevelAt } from './eras.js';
+import { tick as detent } from './haptics.js';
 
 const MAJOR = new Set([-123000,-20000,-10000,-5000,-3000,-1000,-1,500,1000,1492,1650,1800,1900,2025]);
 
@@ -70,9 +71,20 @@ export class Timeline {
       const x = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width;
       this.set(nearestIndex(Math.max(0, Math.min(1, x))));
     };
-    const down = (e) => { dragging = true; pick(e); e.preventDefault(); };
+    const down = (e) => {
+      dragging = true;
+      document.body.classList.add('tl-dragging');
+      this.handle.classList.add('held');
+      pick(e);
+      e.preventDefault();
+    };
     const move = (e) => { if (dragging) pick(e); };
-    const up   = () => { dragging = false; };
+    const up   = () => {
+      if (!dragging) return;
+      dragging = false;
+      document.body.classList.remove('tl-dragging');
+      this.handle.classList.remove('held');
+    };
 
     this.hit.addEventListener('mousedown', down);
     this.hit.addEventListener('touchstart', down, { passive:false });
@@ -93,9 +105,20 @@ export class Timeline {
   set(i, force){
     i = Math.max(0, Math.min(STOPS.length - 1, i));
     if (i === this.index && !force) return;
+    const crossed = !force && this.index != null;
     this.index = i;
     const stop = STOPS[i];
     this.handle.style.left = (positionOf(i) * 100) + '%';
+
+    // One notch of the ruler: vibrate, click, and nudge the grip. A stop at
+    // either end of time, or one with no boundary data behind it, gets the
+    // heavier detent so the ruler isn't uniform under the thumb.
+    if (crossed){
+      detent({ strong: i === 0 || i === STOPS.length - 1 || !stop.file });
+      this.handle.classList.remove('tick');
+      void this.handle.offsetWidth;          // restart the animation
+      this.handle.classList.add('tick');
+    }
 
     const f = formatYear(stop.y);
     document.getElementById('tl-year').innerHTML =

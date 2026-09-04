@@ -58,6 +58,18 @@ const map = new maplibregl.Map({
 map.dragRotate.enable();
 map.touchZoomRotate.enableRotation();
 
+// MapLibre only watches `window.resize`. If the container itself changes size
+// — an embed, a split pane, a phone rotating into a different layout — the GL
+// canvas keeps its old dimensions and the globe renders into a corner while
+// the HTML labels, which measure the DOM live, spread across the full width.
+if (window.ResizeObserver){
+  let raf = 0;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => { try { map.resize(); } catch (_) {} });
+  }).observe(map.getContainer());
+}
+
 const labels    = new Labels(map);
 const eraCache  = new Map();
 let places      = {};
