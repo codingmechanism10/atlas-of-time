@@ -64,13 +64,16 @@ map.touchZoomRotate.enableRotation();
 // — an embed, a split pane, a phone rotating into a different layout — the GL
 // canvas keeps its old dimensions and the globe renders into a corner while
 // the HTML labels, which measure the DOM live, spread across the full width.
-if (window.ResizeObserver){
-  let raf = 0;
-  new ResizeObserver(() => {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => { try { map.resize(); } catch (_) {} });
-  }).observe(map.getContainer());
+// Debounced through a timer, deliberately not through requestAnimationFrame:
+// rAF is suspended while the document is hidden, and a background tab that
+// gets resized and then shown is exactly the case this exists to catch.
+let resizeT = 0;
+function syncSize(){
+  clearTimeout(resizeT);
+  resizeT = setTimeout(() => { try { map.resize(); } catch (_) {} }, 60);
 }
+if (window.ResizeObserver) new ResizeObserver(syncSize).observe(map.getContainer());
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncSize(); });
 
 const labels    = new Labels(map);
 const eraCache  = new Map();

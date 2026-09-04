@@ -82,6 +82,41 @@ article with its extract, its Wikidata facts, and the other named places within
 button hands that grounding to a model (`src/narrate.js`) which writes in the
 house voice; the result is cached by place + era. No key, no change.
 
+**Close-up fidelity** is handled by `src/detail.js`, which loads nothing until
+you descend. Past z3.2 a Natural Earth 50 m coastline swaps in under the coarse
+globe polygon — same fill colour, coarse layers retired by zoom range, so the
+handover is invisible but fjords, deltas and island chains resolve. Past z3.6
+you also get 4,149 states and provinces worldwide (NE 10 m, 2.4 MB, ~683 KB
+gzipped). Cities arrive as a third HTML label class with a dot, rank-gated as
+you zoom.
+
+Both of those last two are **present-day** data, so they are era-gated:
+provinces from 1900, cities from 1800, and the app says out loud that the
+internal boundaries are reference rather than reconstruction the first time
+they appear. This is the honest ceiling on the "make it look like Google Maps"
+ask — for deep history, sub-national boundaries and settlement gazetteers have
+simply never been digitised globally. The territory polygons are the best that
+exists, and they get vaguer the further back you scrub.
+
+**Ambience** (`src/ambience.js`) is a drone plus a slow scatter of notes,
+synthesised in the browser from oscillators and noise. No samples, no
+streaming, nothing bundled. Eleven regions each carry their own tuning system,
+tonic, timbre and density — Yaman over a tanpura-ish fifth in South Asia, Hijaz
+around the eastern Mediterranean, a deliberately non-12TET near-equidistant
+pentatonic and inharmonic struck metal for maritime Southeast Asia, mbira-like
+tines with buzz for sub-Saharan Africa. Region is picked by nearest of several
+anchors, so Mongolia lands on the steppe and Cairo on West Asia. It is
+**evocative synthesis, not authentic music** — not recordings, not traditional
+repertoire — and the app says so the first time you turn it on. Off by default.
+
+**The timeline handle** is a brass grip with a knurled waist and a real hit
+area, and every stop you cross fires a detent: `navigator.vibrate` where the
+platform allows it (Android Chrome; iOS Safari exposes nothing), a synthesised
+wooden click through WebAudio so desktop gets feedback too, and a
+squash-and-stretch nudge on the grip. Ends of time and stops with no boundary
+data get the heavier notch, so the ruler isn't uniform under the thumb.
+Respects `prefers-reduced-motion`.
+
 **Labels are HTML, not GL.** No SDF glyph tiles, no glyph server, no baked-in
 font — which means real serif type with real letter-spacing and small-caps, and
 a collision resolver we control (`src/labels.js`). It reserves the UI chrome's
@@ -164,6 +199,7 @@ What's left from the original list:
 | Home / End | jump to either end of time |
 | click the map | dossier, or a field note with a live lookup |
 | Routes & movement | toggle the trade / migration corridors; click a line to read it |
+| Ambience | synthesised regional drone, off by default |
 | Wander | fly somewhere worth looking at |
 | Set API key | paste an Anthropic key for model-written era dossiers (optional) |
 
