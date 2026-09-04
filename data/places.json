@@ -155,5 +155,190 @@
         "body": "<p class=\"lede\">The 1923 Greco-Turkish population exchange ends the Orthodox presence in Cappadocia after roughly two thousand years.</p><p>Whole villages are emptied and resettled by Muslims arriving from Greece. The rock churches are abandoned to pigeons and to storage; some are used as dovecotes, which is part of why their paintings survived at all.</p><p>Göreme and the surrounding valleys are inscribed on the UNESCO World Heritage list in 1985. The cave dwellings that people spent three millennia carving are now, in a turn nobody could have predicted, hotel rooms.</p>"
       }
     ]
+  },
+
+  "sundaland": {
+    "name": "Sundaland",
+    "subtitle": "The drowned lowland between Borneo, Java and the Malay Peninsula",
+    "center": [108.0, 3.0],
+    "radiusKm": 950,
+    "flyTo": { "center": [108.0, 3.0], "zoom": 4.3, "pitch": 38, "bearing": 6 },
+    "geology": "<h4>How the ground got here</h4><p>The Sunda Shelf is one of the largest areas of continental shelf on Earth — a shallow platform, mostly under 50 m of water, joining Borneo, Sumatra and Java to mainland Asia. Like the North Sea, its shallowness is the whole story: a glacial fall in sea level turns the entire shelf into a single lowland the size of India.</p><p>Two great river systems drained it. The <em>North Sunda</em> or Molengraaff river carried the ancestral Kapuas and the rivers of eastern Sumatra north into the South China Sea; a southern system ran between Sumatra and Java. Their drowned channels are still legible on the seabed.</p><p class=\"fact\">This is tectonic frontier country. The shelf itself is stable continental crust, but its southern and eastern rim is the Sunda Arc — Krakatoa, Tambora, Toba — one of the most violent volcanic margins on the planet.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -74000,
+        "title": "Homo erectus, and then the ash",
+        "body": "<p class=\"lede\">For most of the Pleistocene, low sea levels mean there is no Indonesia — only a forested peninsula of Asia.</p><p>Java has one of the longest hominin records anywhere: <em>Homo erectus</em> is here from perhaps 1.5 million years ago, and a late, separate species — <em>Homo floresiensis</em>, the 'hobbit' — persists on Flores, reachable only by a sea crossing, until around 50,000 years ago.</p><p>Around 74,000 years ago the <strong>Toba</strong> supereruption in northern Sumatra throws out roughly 2,800 km³ of material — the largest eruption of the last two million years. Ash falls centimetres deep across South Asia. Whether it caused a population bottleneck in early humans is argued hard in both directions.</p><div class=\"caution\">The 'Toba catastrophe' hypothesis is genuinely unsettled. Some records show forests recovering within decades; others read a long volcanic winter.</div>"
+      },
+      {
+        "from": -74000, "to": -20000,
+        "title": "The road to Sahul",
+        "body": "<p class=\"lede\">Modern humans move through here on the way to Australia — and they do it while Sundaland is dry and Sahul, to the southeast, is a single continent joining Australia to New Guinea.</p><p>Even at the lowest sea level, the crossing is never fully closed: a chain of straits — <em>Wallace's Line</em> — always separates Sundaland's Asian animals from Australia's marsupials. People cross it by around 65,000–50,000 years ago, in what are, on any reading, deliberate open-water voyages. It is the earliest solid evidence of boats anywhere.</p><p class=\"fact\">The animals never made the jump: no tigers, monkeys or elephants ever reached Australia; no kangaroos or cockatoos ever reached Borneo. People are the exception that proves how real the water gap was.</p>"
+      },
+      {
+        "from": -20000, "to": -9000,
+        "title": "A continent at its fullest, then the flood",
+        "body": "<p class=\"lede\">At the Last Glacial Maximum, Sundaland is a lowland plain of rainforest, savanna mosaic, rivers and freshwater swamp — and then, over ten thousand years, it drowns.</p><p>As the ice melts, the sea rises across an almost flat surface, so it advances fast and far: a metre of rise can move the coastline kilometres inland. The plain breaks into the islands we know. Some researchers argue this drowning scattered a lowland population outward — carrying language, crops and story — and read the flood myths of the region as a memory of it. Others see ordinary Holocene sea-level rise and caution against turning it into an Atlantis.</p><div class=\"caution\">The 'Sundaland as cradle of civilisation' claim (associated with Oppenheimer's <em>Eden in the East</em>) is not the mainstream view. The drowning is real and dramatic; the grand diffusionist story built on it is not established.</div>"
+      },
+      {
+        "from": -9000, "to": -1500,
+        "title": "Islands, and the people who would leave them",
+        "body": "<p class=\"lede\">Sundaland is now an archipelago. Its people are hunter-gatherers and, increasingly, gardeners of yam, taro, banana and sago.</p><p>From around 4,000 BCE, <em>Austronesian</em>-speaking farmers spread south out of Taiwan through the Philippines and into this archipelago, bringing rice, pigs, pottery and outrigger canoes. Over the next few thousand years their descendants will settle an ocean — from Madagascar to Easter Island to New Zealand — in the widest pre-modern expansion of any language family.</p><p>The drowned shelf becomes the maritime world of the <em>Nusantara</em>: short crossings, monsoon timing, trade in forest products, and eventually the Hindu-Buddhist and then Muslim polities of Srivijaya, Majapahit and the Malacca sultanate.</p>"
+      },
+      {
+        "from": -1500, "to": 2100,
+        "title": "Sea, and shelf again",
+        "body": "<p class=\"lede\">From here on the map is the modern one. What was a continent is the world's largest archipelagic nation and a set of busy shallow seas.</p><p>The drowned lowland is still shaping things. The shelf's shallowness makes it one of the most productive fishing grounds and one of the most exposed coastlines on Earth: a large fraction of Jakarta sits on subsiding former swamp, and the government has begun moving the capital to higher ground on Borneo.</p><p class=\"fact\">Trawlers and dredgers off Sumatra and around the Riau islands still bring up the teeth and bones of Pleistocene elephants, rhinos and deer — surface finds from a plain that has been underwater for nine thousand years.</p>"
+      }
+    ]
+  },
+
+  "mesopotamia": {
+    "name": "Southern Mesopotamia",
+    "subtitle": "The alluvium between the Tigris and Euphrates, near Uruk",
+    "center": [45.64, 31.32],
+    "radiusKm": 320,
+    "flyTo": { "center": [45.64, 31.32], "zoom": 6.4, "pitch": 46, "bearing": -10 },
+    "geology": "<h4>How the ground got here</h4><p>This is one of the youngest landscapes on Earth to carry a great civilisation. Every bit of it is river sediment — silt dropped by the Tigris and Euphrates as they slow on their way to the Gulf — laid down over the last ten thousand years on top of a slowly sinking basin, the foreland trough where the Arabian plate dives under the Zagros.</p><p>Because the land is flat and the rivers are higher than the plain between them, they wander and jump their banks. Cities that sat on a channel could be left dry by a shift of a few kilometres; the ruin of Uruk is now well out in the desert, nowhere near the modern Euphrates.</p><p class=\"fact\">The head of the Gulf has moved. In the early Holocene the shoreline reached much further inland, and Ur and Eridu were near-coastal. Millennia of silt have since pushed the land seaward past Basra.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -6000,
+        "title": "Marsh, and no one to see it",
+        "body": "<p class=\"lede\">For most of prehistory this plain does not exist. Through the last glacial period sea level is 120 m down, the Gulf is a dry valley with the combined river running along it, and the future heartland of cities is a windswept lowland.</p><p>As the ice melts the sea floods back up the valley, drowning the river plain and creating, at its inland edge, an enormous zone of reed marsh, lagoon and shifting channel. Small groups of foragers and fishers are present around the margins, but the alluvium proper is still forming.</p>"
+      },
+      {
+        "from": -6000, "to": -3800,
+        "title": "The Ubaid: learning to farm a floodplain",
+        "body": "<p class=\"lede\">The first villages on the southern alluvium belong to the <em>Ubaid</em> culture, and their achievement is hydraulic: the plain gets under 200 mm of rain, so every field has to be irrigated.</p><p>Small canals tap the river; barley and date palm do the work; sheep and goat graze the fallow. Eridu, later remembered by the Sumerians as the first city of all, begins as an Ubaid shrine rebuilt on the same spot again and again.</p><p>Ubaid pottery and the boat-borne trade that carried it spread the whole length of the Gulf and up into northern Mesopotamia — a shared material world stretching a thousand kilometres before there is a single king.</p>"
+      },
+      {
+        "from": -3800, "to": -2900,
+        "title": "Uruk: the first city on Earth",
+        "body": "<p class=\"lede\">Between roughly 3800 and 3100 BCE, <strong>Uruk</strong> becomes something the world has not had before — a city of tens of thousands, drawing in people and grain from its whole hinterland.</p><p>Everything associated with early states appears here in a rush: monumental temple platforms, mass-produced ration bowls, cylinder seals, the specialised potter's wheel, and — to track all the grain moving through the temple stores — <em>writing</em>, beginning as accounting marks pressed into clay around 3300 BCE.</p><p class=\"fact\">The earliest tablets are not literature or law. They are receipts: quantities of barley, beer, sheep and labour. Literature comes centuries later, once the system exists.</p><p>Uruk-style colonies and outposts spring up hundreds of kilometres away along the trade routes north — the first time a southern lowland reaches out and reorganises its neighbours.</p>"
+      },
+      {
+        "from": -2900, "to": -1600,
+        "title": "Sumer and Akkad: cities, then empire",
+        "body": "<p class=\"lede\">The plain fills with rival city-states — Ur, Uruk, Lagash, Umma, Kish, Nippur — each with its patron god, its temple, its king, and its endless border war with the next one over water.</p><p>Around 2334 BCE <strong>Sargon of Akkad</strong> conquers all of them and builds the first empire anyone would recognise as such: a standing army, appointed governors, his daughter Enheduanna installed as high priestess at Ur and writing the earliest poetry attributed to a named author.</p><p>It does not hold. The Akkadian empire collapses within a few generations — drought is one suspected cause — is briefly rebuilt by the Third Dynasty of Ur with a bureaucracy of staggering thoroughness, and collapses again.</p>"
+      },
+      {
+        "from": -1600, "to": -500,
+        "title": "Babylon, and the slow poisoning of the fields",
+        "body": "<p class=\"lede\">Hammurabi's Babylon (c. 1792–1750 BCE) makes the city the lasting centre of the south, a status it keeps under Kassites, Assyrians and the Neo-Babylonian kings for over a thousand years.</p><p>But the land itself is tiring. Irrigating a hot floodplain with no natural drainage pulls salt to the surface; over centuries the southern fields shift from wheat to salt-tolerant barley and then, in places, go out of cultivation entirely. The centre of gravity drifts north toward Babylon and Baghdad, where it has stayed.</p><div class=\"caution\">How much salinisation drove Sumer's decline versus war, siltation and canal politics is debated. It was clearly one real pressure among several.</div>"
+      },
+      {
+        "from": -500, "to": 2100,
+        "title": "Provinces, and marshes",
+        "body": "<p class=\"lede\">After Cyrus takes Babylon in 539 BCE the south is a province — Persian, then Seleucid, Parthian, Sasanian, and from 637 CE Islamic, ruled from Ctesiphon and then nearby Baghdad.</p><p>The extreme south reverts to what it was before the cities: the <em>Ahwar</em>, the great marshes, home to the Maʻdan who build reed houses on floating islands in a way strikingly close to the Sumerian images. Saddam Hussein's regime drained most of the marshes in the 1990s as a reprisal; partial reflooding since 2003 has brought some of them back.</p><p class=\"fact\">The World Heritage listing for the region, made in 2016, is a joint one: the marshes and the ruined cities — Uruk, Ur, Eridu — named together, as one drowned-and-resurfaced landscape.</p>"
+      }
+    ]
+  },
+
+  "great-zimbabwe": {
+    "name": "Great Zimbabwe",
+    "subtitle": "Stone city on the Zimbabwe plateau, between the Limpopo and the Zambezi",
+    "center": [30.93, -20.27],
+    "radiusKm": 260,
+    "flyTo": { "center": [30.93, -20.27], "zoom": 6.7, "pitch": 52, "bearing": -18 },
+    "geology": "<h4>How the ground got here</h4><p>The Zimbabwe Craton is very old continental crust — over 2.5 billion years — and its granite weathers in a particular way: onion-skin exfoliation peels off curved sheets, leaving rounded <em>kopjes</em> and, crucially, natural slabs that split into flat, brick-like blocks along the sheeting planes.</p><p>That is the building material. The dry-stone walls of Great Zimbabwe — no mortar, some over 5 m thick and 11 m high — are made of granite that the hill quarried for the builders by cracking in the sun and frost.</p><p class=\"fact\">The plateau sits high enough (1,000–1,500 m) to be cool, well-watered and free of the tsetse fly that makes cattle-keeping impossible in the lowveld on either side. Everything about the site's wealth starts with that: it is good cattle country next to gold country.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": 200,
+        "title": "Foragers, and the first farmers",
+        "body": "<p class=\"lede\">The plateau has one of the richest concentrations of hunter-gatherer rock art in the world — fine polychrome paintings by the ancestors of the San, spanning many thousands of years.</p><p>In the first few centuries CE, Bantu-speaking farmers move onto the plateau from the north, bringing sorghum and millet, cattle, and — soon — iron working. The forager and farmer worlds overlap for a long time before the farming economy becomes dominant.</p>"
+      },
+      {
+        "from": 200, "to": 1000,
+        "title": "Cattle, chiefs and the Indian Ocean",
+        "body": "<p class=\"lede\">By the later first millennium, plateau societies are stratified: cattle are wealth, wealth is political power, and the hilltop is where the powerful live.</p><p>At <em>Mapungubwe</em>, just south on the Limpopo, a class of rulers physically separates itself onto a sandstone hill around 1220 CE, buried with gold ornaments — a gold rhino, gold bangles — and Chinese celadon and glass beads from the coast. This is the template Great Zimbabwe scales up: sacred leadership, cattle, and a trade route running to the Swahili port of <strong>Sofala</strong> and out into the monsoon world.</p>"
+      },
+      {
+        "from": 1000, "to": 1450,
+        "title": "The city at its height",
+        "body": "<p class=\"lede\">Between roughly 1100 and 1450 CE, Great Zimbabwe is the largest settlement in sub-Saharan Africa outside the Nile — perhaps 18,000 people at its peak, spread across several square kilometres.</p><p>The stone enclosures — the Hill Complex, the Great Enclosure with its mysterious conical tower, the Valley ruins — are built for the elite; most people live in <em>daga</em> (earth and clay) houses around them. The economy runs on cattle, farmed grain, ironwork, and above all gold, panned and mined across the plateau and traded to the coast for cloth, ceramics and glass beads. Persian and Chinese pottery has been excavated inside the walls.</p><p class=\"fact\">The soapstone birds found on the site — eight carved raptors on tall columns — are unique to Great Zimbabwe. One of them is the emblem on the flag of the modern country, which took the ruin's name at independence in 1980.</p>"
+      },
+      {
+        "from": 1450, "to": 1700,
+        "title": "Moved on, not fallen",
+        "body": "<p class=\"lede\">Great Zimbabwe is largely abandoned in the 15th century — probably because a city that size exhausts its firewood, grazing and soil, and the trade and the rulers shift elsewhere.</p><p>Elsewhere means the <em>Mutapa</em> state to the north, near the Zambezi, and the <em>Torwa</em> and later <em>Rozvi</em> states to the southwest at Khami and Danangombe, which keep building in dressed stone — often more finely than Great Zimbabwe itself. The tradition does not end; its centre relocates.</p><p>When the Portuguese arrive on the Zambezi in the 1500s they trade with, and write about, the Mutapa court — one of the few African interior states documented from the outside this early.</p>"
+      },
+      {
+        "from": 1700, "to": 2100,
+        "title": "A ruin, and an argument about who built it",
+        "body": "<p class=\"lede\">From the moment Europeans reached the site in the 1870s, colonial society insisted Africans could not have built it — proposing Phoenicians, Arabs, the Queen of Sheba, anyone else.</p><p>Early treasure-hunters, licensed by Cecil Rhodes's company, wrecked the archaeology digging for gold. Careful excavation — by David Randall-MacIver in 1905, Gertrude Caton-Thompson in 1929, and everyone since — showed unambiguously that the builders were the local Shona ancestors, from the medieval period. The Rhodesian government suppressed that conclusion into the 1970s.</p><p class=\"fact\">The site is now a UNESCO World Heritage listing and a national symbol. The dispute over its origins is a case study, taught worldwide, in how politics bends archaeology.</p><div class=\"caution\">Population and date figures for the city vary between researchers. The identity of the builders does not — that is settled.</div>"
+      }
+    ]
+  },
+
+  "cahokia": {
+    "name": "Cahokia",
+    "subtitle": "Earthwork city in the Mississippi floodplain, opposite modern St. Louis",
+    "center": [-90.06, 38.66],
+    "radiusKm": 220,
+    "flyTo": { "center": [-90.06, 38.66], "zoom": 6.9, "pitch": 50, "bearing": 12 },
+    "geology": "<h4>How the ground got here</h4><p>Cahokia sits in the <em>American Bottom</em>, a wide belt of Mississippi River floodplain below the confluence with the Missouri and Illinois. The river has spent the last ten thousand years swinging back and forth across this bottomland, leaving a patchwork of old channels, oxbow lakes, natural levees and rich backswamp — an unusually productive mosaic for farming, fishing and fowling all at once.</p><p>There is no building stone. The material for monuments is the floodplain itself: some 55 earthen mounds at Cahokia, built basket-load by basket-load. <em>Monks Mound</em>, the largest, holds around 600,000 cubic metres of earth and covers a bigger footprint than the Great Pyramid.</p><p class=\"fact\">The bluffs on the eastern edge are loess — wind-blown glacial dust — draining into the bottom through a set of creeks. That transition zone, wet bottom meeting dry upland, is where most of the population actually lived.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -600,
+        "title": "Ice margin, then a long occupation",
+        "body": "<p class=\"lede\">During the glacial maxima the ice sheet stops a little north of here; the Mississippi is a braided meltwater torrent and the climate is cold steppe.</p><p>After the ice retreats, people are in the valley continuously from Paleoindian times on — hunting, then adding native seed crops (goosefoot, marsh elder, little barley) that are domesticated in the midcontinent thousands of years before maize arrives. The Woodland-period communities here build burial mounds and trade in copper, marine shell and mica across half the continent.</p>"
+      },
+      {
+        "from": -600, "to": 900,
+        "title": "Maize, and the gathering",
+        "body": "<p class=\"lede\">Maize, bred over centuries as it moved up from Mexico, becomes a staple in the American Bottom by around 900 CE — and the population climbs sharply.</p><p>Villages spread along the old channels and the creek mouths. The society is recognisably <em>Mississippian</em> in the making: settled maize farmers, ranked lineages, a religious life organised around platform mounds and open plazas. What has not happened yet is centralisation.</p>"
+      },
+      {
+        "from": 900, "to": 1150,
+        "title": "The 'big bang' and the city",
+        "body": "<p class=\"lede\">Around 1050 CE Cahokia is deliberately, rapidly rebuilt on a new plan — archaeologists call it the 'big bang' — and becomes the largest settlement north of Mexico, a distinction it holds until Philadelphia in the 1780s.</p><p>Estimates run from 10,000 to 20,000 people in the city and its immediate suburbs, more across the wider bottom. A 20-hectare Grand Plaza is levelled by hand at its centre; Monks Mound rises in stages on its north side; a stockade of some 20,000 logs later encloses the core. Standardised house-building, mass feasting deposits, and imported goods from the Gulf, the Appalachians and the Great Lakes all appear at once.</p><p class=\"fact\">Mound 72 holds a burial of a high-status individual laid on a bed of more than 20,000 shell beads, alongside caches of arrows and the bodies of dozens of sacrificed young women — evidence of a hierarchy with the power of life and death.</p>"
+      },
+      {
+        "from": 1150, "to": 1400,
+        "title": "Coming apart",
+        "body": "<p class=\"lede\">Within a century of its peak, Cahokia is emptying. By around 1350 the site is essentially abandoned, and stays that way.</p><p>No single cause is agreed. The stockade — rebuilt four times — points to chronic conflict. Deforestation of the uplands for fuel and palisades may have worsened local flooding; a drying climate after 1200 stressed the maize crop; and a political-religious order that demanded so much labour and display may simply have lost the consent it ran on. People dispersed into smaller, more egalitarian communities.</p><div class=\"caution\">The 'ecocide' reading of Cahokia has been actively challenged; recent work finds less erosion and flooding than the older story assumed. Depopulation is certain; its drivers are not.</div>"
+      },
+      {
+        "from": 1400, "to": 2100,
+        "title": "The vacant quarter, and the interstate",
+        "body": "<p class=\"lede\">When Europeans arrive the bottom is thinly populated — a buffer zone between later groups. The mound builders' identity is lost to outsiders, and the same racist reflex that met Great Zimbabwe attributes the earthworks to anyone but Native Americans.</p><p>The name 'Cahokia' is borrowed from an Illinois-confederacy band living nearby in the 1600s, not the builders, whose own name for the place is unknown. Nineteenth-century St. Louis is briefly nicknamed 'Mound City' before its mounds are carted away for fill.</p><p class=\"fact\">Cahokia Mounds is now a UNESCO World Heritage Site — one of only a couple of dozen in the United States. U.S. Route 40 runs directly across it, and a subdivision covered part of the site before preservation caught up.</p>"
+      }
+    ]
+  },
+
+  "aral": {
+    "name": "The Aral Sea",
+    "subtitle": "Endorheic basin between the Kyzylkum and the Ustyurt plateau",
+    "center": [59.5, 45.0],
+    "radiusKm": 420,
+    "flyTo": { "center": [59.5, 45.0], "zoom": 6.1, "pitch": 44, "bearing": -8 },
+    "geology": "<h4>How the ground got here</h4><p>The Aral sits in a shallow tectonic depression with no outlet to the ocean — an <em>endorheic</em> basin. Two rivers fed it: the <strong>Amu Darya</strong> (the classical Oxus), off the Pamir and Hindu Kush, and the <strong>Syr Darya</strong> (the Jaxartes), off the Tian Shan. Water left only by evaporation, which is why the sea was mildly salty and why its level always tracked how much the rivers delivered.</p><p>That level has never been stable. Sediment cores show the Aral has shrunk and refilled many times over the Holocene, sometimes nearly drying out — often because the Amu Darya wandered, at times running west into the Caspian via the Uzboy channel instead of north into the Aral.</p><p class=\"fact\">The exposed former seabed is now the <em>Aralkum</em>, the world's youngest desert. Its surface is loaded with salt and, in places, agricultural chemicals and residues from a Soviet bioweapons test site on a former island; wind lifts it in dust storms that carry hundreds of kilometres.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -3000,
+        "title": "A lake that comes and goes",
+        "body": "<p class=\"lede\">Through the last glacial period the basin is cold desert; the rivers, fed by mountain ice, fluctuate wildly.</p><p>By the mid-Holocene the Aral is a substantial lake fringed by reed marsh and tugai forest along the deltas — prime habitat for fishing and hunting foragers, and later for the herders of the surrounding steppe. The deltas of the Amu and Syr, where fresh water spreads out before the salt, are the productive edge.</p>"
+      },
+      {
+        "from": -3000, "to": 500,
+        "title": "Oxus civilisation and the first canals",
+        "body": "<p class=\"lede\">The delta oases become the setting for some of Central Asia's earliest complex societies.</p><p>The <em>Oxus civilisation</em> (BMAC) of the Bronze Age builds fortified towns along the Amu Darya. In the Iron Age, Khwarezm — the irrigated land along the lower Oxus — emerges as a distinct polity with a dense network of canals and a string of mud-brick desert fortresses, the <em>Elliq-Qala</em>, whose ruins still stand in the Kyzylkum. Diverting river water for farming starts here, at a scale the land could absorb.</p>"
+      },
+      {
+        "from": 500, "to": 1850,
+        "title": "Khwarezm: a name that meant water engineering",
+        "body": "<p class=\"lede\">For over a thousand years the lower Oxus supports one of the great irrigation societies of the Islamic world, centred on Gurganj and later Khiva.</p><p>Khwarezm gives its name to the mathematician <strong>al-Khwarizmi</strong> — from whom 'algorithm', and via his book 'al-jabr', 'algebra'. The region is rich enough to be worth destroying: Genghis Khan sacks it in 1221, and the Mongols are said to have broken the dams and drowned Gurganj. The canals are rebuilt. The Aral, through all of this, stays roughly full — human water use is real but within the rivers' budget.</p>"
+      },
+      {
+        "from": 1850, "to": 1960,
+        "title": "Cotton, and the Russian plan",
+        "body": "<p class=\"lede\">The Russian Empire annexes the region in the 1860s–70s and reorganises it around one crop: cotton, for Russian mills.</p><p>Irrigated area expands steadily under the Tsars and then dramatically under the Soviet Union, which treats Central Asian water as a resource to be fully allocated. Through the 1950s the Aral is still the fourth-largest lake on Earth, about 68,000 km², supporting a fishing industry that lands tens of thousands of tonnes a year from ports like Aralsk and Moʻynoq.</p>"
+      },
+      {
+        "from": 1960, "to": 2100,
+        "title": "The sea that was spent",
+        "body": "<p class=\"lede\">From 1960 the Soviet Union massively expands cotton and rice irrigation — above all the leaky, unlined <em>Qaraqum Canal</em> drawing off the Amu Darya. Within a few years the rivers stop reaching the sea in most years.</p><p>The Aral falls off a cliff: by 2000 it has split into pieces; by 2014 the eastern basin — once open water to the horizon — is dry ground for the first time in 600 years. Salinity in what remains rises past the ocean's; the native fish die; the ports are left tens of kilometres from any shore, rusting trawlers on sand.</p><p class=\"fact\">The northern lobe has partly recovered. A World Bank–funded dam, the <em>Kokaral</em>, completed in 2005, holds back the Syr Darya's flow; the North Aral Sea has risen several metres, cooled the local climate, and brought commercial fishing back to Aralsk. The much larger southern sea is generally considered beyond recovery.</p><div class=\"caution\">This is often called the worst human-caused environmental disaster of the 20th century. That framing is widely accepted, but the water was diverted knowingly, for economic output that was real — it was a trade-off, not an accident.</div>"
+      }
+    ]
   }
 }

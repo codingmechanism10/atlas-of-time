@@ -1,11 +1,18 @@
 // dossier.js — the panel.
 //
-// Two modes. A seeded place gets hand-written, sourced history for the
-// selected era. Anywhere else gets a field note: everything the map itself
-// actually knows about that spot, plus the prompt a live model would be
-// handed. Better to show the seam than to fake a smooth surface.
+// Three modes now:
+//   1. A seeded place — hand-written, sourced history for the selected era.
+//   2. A field note anywhere else — everything the map itself knows about the
+//      spot, plus a grounded lookup (Wikipedia + Wikidata, no key) filled in
+//      asynchronously.
+//   3. On top of the field note, if an API key is set, a model-written era
+//      dossier built from that same grounding (see narrate.js).
+//
+// The seam between hand-seeded and generated is deliberately still visible.
 
 import { formatYear, bandFor, seaLevelAt } from './eras.js';
+import { groundCoordinate, bearing, formatKm } from './lookup.js';
+import { hasKey, narrateDossier, cachedDossier } from './narrate.js';
 
 const el = {
   root  : document.getElementById('dossier'),
@@ -28,7 +35,13 @@ function eraChip(stop){
   return `${f.n} ${f.era} — ${stop.label}`;
 }
 
+// A click that lands while a lookup is still running should abandon it.
+let fieldToken = 0;
+
+// ---------------------------------------------------------------- seeded place
+
 export function showPlace(place, stop){
+  fieldToken++;
   const entry = place.entries.find(e => stop.y >= e.from && stop.y < e.to)
              || place.entries[place.entries.length - 1];
 
@@ -40,10 +53,14 @@ export function showPlace(place, stop){
   open();
 }
 
+// ---------------------------------------------------------------- field note
+
 export function showFieldNote({ lngLat, polity, subjectTo, precision, physio, stop }){
+  const token = ++fieldToken;
   const f = formatYear(stop.y);
   const sl = seaLevelAt(stop.y);
-  const lat = lngLat.lat.toFixed(2), lng = lngLat.lng.toFixed(2);
+  const lat = +lngLat.lat.toFixed(2), lng = +lngLat.lng.toFixed(2);
+  const period = bandFor(stop.y);
 
   el.kicker.textContent = 'Field note';
   el.title.textContent  = polity || (physio ? physio : 'Open ground');
@@ -58,13 +75,13 @@ export function showFieldNote({ lngLat, polity, subjectTo, precision, physio, st
     if (precision != null)
       known.push(`<li>Boundary confidence in the source data: <code>${precision}</code>.</li>`);
   } else if (stop.file){
-    known.push(`<li>No polity is mapped here at this date — either genuinely unclaimed, or simply beyond what the reconstruction covers.</li>`);
+    known.push(`<li>No polity is mapped here at this date — either genuinely unclaimed, or beyond what the reconstruction covers.</li>`);
   } else {
     known.push(`<li>This is a geological stop. No boundary reconstruction exists this far back — only the sea-level estimate.</li>`);
   }
   if (physio) known.push(`<li>Physiographic region: <strong>${esc(physio)}</strong>.</li>`);
   known.push(`<li>Relative sea level: <strong>${sl >= 0 ? '+' : ''}${sl.toFixed(0)} m</strong> against today.</li>`);
-  known.push(`<li>Period: ${bandFor(stop.y)}.</li>`);
+  known.push(`<li>Period: ${esc(period)}.</li>`);
 
   const prompt =
 `Write a short history dossier for the place at ${lat}, ${lng}
@@ -77,28 +94,112 @@ Say plainly where the evidence is thin.`;
   el.body.innerHTML = `
     <h4>What the map knows</h4>
     <ul>${known.join('')}</ul>
-    <h4>What it doesn't</h4>
-    <p class="stub">No dossier has been written for this spot yet. In the live version this is where a
-    grounded lookup runs — Wikipedia geosearch, Wikidata and the Pleiades gazetteer for these
-    coordinates — and a model writes the era dossier from what comes back, cached by place and era.</p>
-    <p class="stub">Three places are seeded by hand so you can see the finished shape:
-    <a href="#" data-jump="ladakh">Ladakh</a>,
-    <a href="#" data-jump="doggerland">Doggerland</a>,
-    <a href="#" data-jump="cappadocia">Cappadocia</a>.</p>
-    <button class="gbtn" id="copy-prompt" style="margin-top:6px">Copy the research prompt</button>
+    <h4>In the record</h4>
+    <div id="fn-record"><p class="stub">Reading Wikipedia and Wikidata for this coordinate…</p></div>
+    <div id="fn-ai"></div>
+    <div class="fn-tools">
+      <button class="gbtn" id="copy-prompt">Copy the research prompt</button>
+    </div>
     <div class="caution">Boundary reconstructions for deep history are interpretations, and cartographers
     disagree with each other. The further back the timeline goes, the more these polygons mean
     &ldquo;roughly this cultural sphere&rdquo; than &ldquo;this border&rdquo;.</div>`;
 
-  const btn = el.body.querySelector('#copy-prompt');
-  btn.onclick = () => {
+  el.body.querySelector('#copy-prompt').onclick = (e) => {
     navigator.clipboard?.writeText(prompt);
-    btn.textContent = 'Copied';
-    setTimeout(() => { btn.textContent = 'Copy the research prompt'; }, 1600);
+    e.target.textContent = 'Copied';
+    setTimeout(() => { e.target.textContent = 'Copy the research prompt'; }, 1600);
   };
+
   open();
+  fillRecord(token, { lat, lng, year: stop.y, eraLabel: stop.label,
+                      polity, subjectTo, precision, physio, seaLevel: sl, period });
 }
 
+async function fillRecord(token, ctx){
+  const box = () => (token === fieldToken ? el.body.querySelector('#fn-record') : null);
+  let ground = null;
+  try {
+    ground = await groundCoordinate(ctx.lat, ctx.lng);
+  } catch {
+    if (box()) box().innerHTML = `<p class="stub">Couldn't reach Wikipedia just now. The research prompt below still works.</p>`;
+    return;
+  }
+  const target = box();
+  if (!target) return;
+
+  if (!ground.primary && !ground.articles.length){
+    target.innerHTML = `<p class="stub">Nothing in Wikipedia is tagged within 10&nbsp;km of this point — genuinely empty ground, ocean, or just unmapped.</p>`;
+  } else {
+    target.innerHTML = renderGround(ground, [ctx.lng, ctx.lat]);
+  }
+
+  // Model dossier: offered only if a key is set. A cached one renders at once.
+  const aiBox = el.body.querySelector('#fn-ai');
+  if (!aiBox) return;
+  const cached = cachedDossier(ctx.lat, ctx.lng, ctx.year);
+  if (cached){
+    renderAI(aiBox, cached.html, cached.model, true);
+  } else if (hasKey()){
+    aiBox.innerHTML =
+      `<button class="gbtn ai" id="fn-write">Write the era dossier &rarr;</button>`;
+    aiBox.querySelector('#fn-write').onclick = () => runNarrate(token, aiBox, ctx, ground);
+  }
+}
+
+async function runNarrate(token, aiBox, ctx, ground){
+  aiBox.innerHTML = `<p class="stub">Writing — grounded in the lookup above…</p>`;
+  try {
+    const { html, model, cached } = await narrateDossier({
+      title: (ground.primary?.title) || ctx.polity || null,
+      lat: ctx.lat, lng: ctx.lng, year: ctx.year, eraLabel: ctx.eraLabel,
+      polity: ctx.polity, subjectTo: ctx.subjectTo, precision: ctx.precision,
+      physio: ctx.physio, seaLevel: ctx.seaLevel, period: ctx.period, ground,
+    });
+    if (token !== fieldToken) return;
+    renderAI(aiBox, html, model, cached);
+  } catch (e){
+    if (token !== fieldToken) return;
+    aiBox.innerHTML = `<p class="caution">${esc(e.message || 'The dossier could not be written.')}</p>
+      <button class="gbtn ai" id="fn-retry">Try again</button>`;
+    aiBox.querySelector('#fn-retry').onclick = () => runNarrate(token, aiBox, ctx, ground);
+  }
+}
+
+function renderAI(box, html, model, cached){
+  box.innerHTML =
+    `<div class="ai-mark">Written by ${esc(model)}${cached ? ' · cached' : ''} · grounded, not verified</div>
+     <div class="ai-body">${html}</div>`;
+}
+
+function renderGround(ground, here){
+  const p = ground.primary;
+  let out = '';
+  if (p){
+    if (p.thumb) out += `<img class="fn-thumb" src="${esc(p.thumb)}" alt="">`;
+    out += `<p class="fn-lead"><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a>`;
+    if (p.distM > 120) out += ` <span class="fn-dist">${formatKm(p.distM)} ${bearing(here, p.lngLat)}</span>`;
+    out += `</p>`;
+    if (p.extract) out += `<p class="fn-extract">${esc(trim(p.extract, 460))}</p>`;
+  }
+  if (ground.wikidata?.facts?.length){
+    out += `<div class="fn-facts">` +
+      ground.wikidata.facts.map(f =>
+        `<span><b>${esc(f.label)}</b> ${esc(f.value)}</span>`).join('') +
+      `</div>`;
+  }
+  const rest = ground.articles.filter(a => !p || a.title !== p.title).slice(0, 6);
+  if (rest.length){
+    out += `<p class="fn-also"><b>Also within 10&nbsp;km</b> ` +
+      rest.map(a =>
+        `${esc(a.title)} <span class="fn-dist">${formatKm(a.distM)} ${bearing(here, [a.lng, a.lat])}</span>`
+      ).join(' · ') + `</p>`;
+  }
+  out += `<p class="fn-src">Wikipedia geosearch &amp; Wikidata, live. Nearest labelled point, not necessarily this exact spot.</p>`;
+  return out;
+}
+
+function trim(s, n){ return s.length > n ? s.slice(0, s.lastIndexOf(' ', n)) + '…' : s; }
+
 function esc(s){
-  return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  return String(s ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 }

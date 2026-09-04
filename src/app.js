@@ -5,6 +5,7 @@ import { Labels } from './labels.js';
 import { Timeline } from './timeline.js';
 import { seaLevelAt, STOPS } from './eras.js';
 import * as Dossier from './dossier.js';
+import { initSettings } from './settings.js';
 
 const USE_TERRAIN = true;   // set false if the elevation tiles are unreachable
 
@@ -254,6 +255,7 @@ map.on('load', async () => {
   await labels.loadPhysio('data/base/physio.geojson');
 
   timeline = new Timeline((stop) => { applyEra(stop); });
+  initSettings();
   window.atlas = { map, timeline, labels, goToPlace };
 
   updateHud();

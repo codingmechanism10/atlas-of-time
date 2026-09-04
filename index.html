@@ -60,7 +60,11 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--sea-ab
 #hud .coords{margin-top:6px;font-variant-numeric:tabular-nums;font-size:9.5px;opacity:.55}
 
 /* ---------- gazetteer ---------- */
-#gaz{position:absolute;left:24px;bottom:190px;z-index:5;display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+#gaz{position:absolute;left:24px;bottom:190px;z-index:5;display:flex;flex-direction:column;gap:6px;
+  align-items:flex-start;max-height:calc(100vh - 360px);overflow-y:auto;padding-right:4px;
+  scrollbar-width:thin}
+#gaz::-webkit-scrollbar{width:5px}
+#gaz::-webkit-scrollbar-thumb{background:rgba(201,167,101,.25)}
 .gbtn{
   font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:#e0cfa4;background:rgba(23,19,16,.72);border:1px solid rgba(201,167,101,.28);
@@ -153,6 +157,55 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--sea-ab
 #d-body::-webkit-scrollbar{width:9px}
 #d-body::-webkit-scrollbar-thumb{background:rgba(120,100,66,.3)}
 
+/* ---------- field note ---------- */
+#d-body .fn-thumb{float:right;width:116px;margin:2px 0 10px 14px;border:1px solid rgba(120,100,66,.4);
+  filter:sepia(.18) saturate(.9)}
+#d-body .fn-lead{font-size:14.2px;margin:0 0 8px}
+#d-body .fn-lead a{color:#5a4526;text-decoration:none;border-bottom:1px solid rgba(120,100,66,.4)}
+#d-body .fn-lead a:hover{color:var(--terra)}
+#d-body .fn-dist{font-family:var(--sans);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold-dim);white-space:nowrap}
+#d-body .fn-extract{font-size:12.8px;color:#463620}
+#d-body .fn-facts{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0 2px;clear:both}
+#d-body .fn-facts span{font-family:var(--sans);font-size:10px;letter-spacing:.03em;
+  border:1px solid rgba(120,100,66,.32);padding:3px 7px;color:#4b3b25}
+#d-body .fn-facts b{color:var(--gold-dim);font-weight:600;text-transform:uppercase;
+  letter-spacing:.12em;font-size:9px;margin-right:4px}
+#d-body .fn-also{font-size:11.5px;line-height:1.85;color:#5b4a31;margin:12px 0 0}
+#d-body .fn-also b{font-family:var(--sans);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold-dim);display:block;margin-bottom:3px}
+#d-body .fn-src{font-family:var(--sans);font-size:9.5px;letter-spacing:.03em;color:#8a7350;
+  margin:10px 0 0;font-style:italic}
+#d-body .fn-tools{margin:16px 0 0}
+#d-body .gbtn.ai{background:rgba(176,96,44,.08);color:#7a4a2c;border-color:rgba(176,96,44,.5)}
+#d-body .ai-mark{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold-dim);margin:20px 0 8px;padding-top:14px;border-top:1px solid rgba(120,100,66,.26)}
+#d-body .ai-body{font-size:13.5px;line-height:1.66}
+
+/* ---------- settings ---------- */
+#settings{position:absolute;inset:0;z-index:12;background:rgba(10,7,4,.62);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+#settings[hidden]{display:none}
+.set-card{width:400px;max-width:calc(100% - 40px);background:linear-gradient(172deg,var(--panel),#e2d3b2);
+  border:1px solid var(--panel-edge);box-shadow:0 30px 70px rgba(0,0,0,.55);padding:26px 28px 22px;
+  color:#3a2e1d;font-size:12.7px;line-height:1.62}
+.set-card h3{margin:0 0 12px;font-size:19px;font-weight:500;letter-spacing:.01em}
+.set-card p{margin:0 0 12px}
+.set-card .set-note{font-family:var(--sans);font-size:10.5px;line-height:1.6;color:#6a5433}
+.set-card code{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;background:rgba(120,100,66,.14);padding:1px 4px}
+.set-card label{display:block;font-family:var(--sans);font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold-dim);margin:14px 0 5px}
+.set-card input,.set-card select{width:100%;font-family:var(--sans);font-size:12.5px;padding:8px 10px;
+  border:1px solid var(--panel-edge);background:rgba(255,251,240,.7);color:#3a2e1d}
+.set-row{display:flex;gap:8px;margin-top:16px}
+.set-status{font-family:var(--sans);font-size:10.5px;color:#6a5433;min-height:14px;margin-top:12px!important}
+.gbtn.sub{background:none;border-color:rgba(201,167,101,.22);color:rgba(224,207,164,.7);
+  font-size:9px;padding:5px 10px}
+#gaz .gbtn.sub{margin-top:4px}
+.gbtn.sub.on{color:#e8b98e;border-color:rgba(176,96,44,.5)}
+.set-card .gbtn{color:#5a4526;border-color:rgba(120,100,66,.4);background:rgba(255,251,240,.5)}
+.set-card .gbtn.sub{color:#6a5433}
+
 /* ---------- loading ---------- */
 #boot{position:absolute;inset:0;z-index:20;background:var(--sea-abyss);
   display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
@@ -198,7 +251,34 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--sea-ab
   <button class="gbtn" data-place="ladakh">Ladakh</button>
   <button class="gbtn" data-place="doggerland">Doggerland</button>
   <button class="gbtn" data-place="cappadocia">Cappadocia</button>
+  <button class="gbtn" data-place="sundaland">Sundaland</button>
+  <button class="gbtn" data-place="mesopotamia">Mesopotamia</button>
+  <button class="gbtn" data-place="great-zimbabwe">Great Zimbabwe</button>
+  <button class="gbtn" data-place="cahokia">Cahokia</button>
+  <button class="gbtn" data-place="aral">The Aral Sea</button>
   <button class="gbtn wander" id="wander">Wander &rarr;</button>
+  <button class="gbtn sub" id="settings-btn">Set API key ·</button>
+</div>
+
+<div id="settings" hidden>
+  <div class="set-card">
+    <h3>Live dossiers</h3>
+    <p>Every click already runs a keyless Wikipedia&nbsp;+&nbsp;Wikidata lookup. Add an
+    Anthropic API key and the field note will also offer a model-written dossier for the
+    selected era, grounded in that lookup.</p>
+    <p class="set-note">The key is stored in this browser only (<code>localStorage</code>) and
+    is sent nowhere but <code>api.anthropic.com</code>, directly from the page.</p>
+    <label for="set-key">Anthropic API key</label>
+    <input id="set-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+    <label for="set-model">Model</label>
+    <select id="set-model"></select>
+    <div class="set-row">
+      <button class="gbtn" id="set-save">Save</button>
+      <button class="gbtn sub" id="set-clear">Clear key</button>
+    </div>
+    <p class="set-status" id="set-status"></p>
+    <p class="set-note">Get a key at <code>console.anthropic.com</code>. Usage is billed to that account.</p>
+  </div>
 </div>
 
 <div id="timeline">
