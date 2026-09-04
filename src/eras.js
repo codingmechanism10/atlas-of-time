@@ -63,7 +63,8 @@ export const STOPS = [
   { y:   1960, file:'world_1960.geojson',     label:'The year of Africa' },
   { y:   1994, file:'world_1994.geojson',     label:'After the Cold War' },
   { y:   2000, file:'world_2000.geojson',     label:'Turn of the millennium' },
-  { y:   2010, file:'world_2010.geojson',     label:'The present map' },
+  { y:   2010, file:'world_2010.geojson',     label:'The eve of the Arab Spring' },
+  { y:   2025, file:'world_2025.geojson',     label:'The present map' },
 ];
 
 export const BANDS = [
@@ -73,7 +74,7 @@ export const BANDS = [
   { from:  -1200, to:   500, name:'Classical Antiquity' },
   { from:    500, to:  1400, name:'Medieval' },
   { from:   1400, to:  1800, name:'Early Modern' },
-  { from:   1800, to:  2010, name:'Modern' },
+  { from:   1800, to:  2026, name:'Modern' },
 ];
 
 // Relative sea-level curve, metres against today's datum. Sampled from
@@ -121,7 +122,7 @@ export function formatYear(y){
 // Pure years-before-present would squash the last four centuries into a
 // sliver; pure index spacing would hide the fact that deep time is deep.
 // Blend the two so the ruler is both usable and honest about its shape.
-const OLDEST = -123000, NEWEST = 2010, SPAN = NEWEST - OLDEST;
+const OLDEST = -123000, NEWEST = 2025, SPAN = NEWEST - OLDEST;
 const INDEX_WEIGHT = 0.66;
 
 export function positionOf(index){

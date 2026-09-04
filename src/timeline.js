@@ -2,7 +2,7 @@
 
 import { STOPS, BANDS, positionOf, nearestIndex, formatYear, bandFor, seaLevelAt } from './eras.js';
 
-const MAJOR = new Set([-123000,-20000,-10000,-5000,-3000,-1000,-1,500,1000,1492,1650,1800,1900,2010]);
+const MAJOR = new Set([-123000,-20000,-10000,-5000,-3000,-1000,-1,500,1000,1492,1650,1800,1900,2025]);
 
 export class Timeline {
   constructor(onChange){

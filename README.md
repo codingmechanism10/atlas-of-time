@@ -37,7 +37,11 @@ Maps and it costs one line in the style.
 **The timeline** is wired to
 [aourednik/historical-basemaps](https://github.com/aourednik/historical-basemaps),
 a georeferenced collection of world political and cultural boundaries. 53 of its
-snapshots ship here, simplified, in `data/eras/`. Four extra stops
+snapshots ship here, simplified, in `data/eras/`, from 123,000 BCE to 2010 —
+that repository's most recent map. The present-day stop, `world_2025.geojson`,
+is built separately from Natural Earth's 110 m admin-0 countries (same schema,
+same Douglas-Peucker treatment) so "today" reflects South Sudan, the post-2014
+map and current names rather than the 2010 borders. Four extra stops
 (40,000 / 20,000 / 14,000 / 12,000 BCE) carry a sea-level estimate with no
 boundary data, because none exists that far back and pretending otherwise would
 be a lie.
@@ -167,7 +171,7 @@ What's left from the original list:
 
 ## Data and credits
 
-- Historical boundaries — [aourednik/historical-basemaps](https://github.com/aourednik/historical-basemaps)
+- Historical boundaries — [aourednik/historical-basemaps](https://github.com/aourednik/historical-basemaps); present-day borders from [Natural Earth](https://www.naturalearthdata.com) 110 m admin-0
 - Coastlines, lakes, rivers, physiography, bathymetry — [Natural Earth](https://www.naturalearthdata.com) (public domain)
 - Relief — Mapzen / AWS Terrain Tiles
 - Rendering — [MapLibre GL JS](https://maplibre.org) 5.24 (vendored in `vendor/`)
