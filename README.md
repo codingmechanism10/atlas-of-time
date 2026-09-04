@@ -4,9 +4,10 @@ An interactive globe you can fall into. Spin it, zoom until it flattens into an
 atlas, scrub a timeline from 123,000 BCE to the present and watch borders and
 coastlines redraw, then click a place to read who lived there.
 
-Built as a vertical slice: the map, the timeline and the panel are all real and
-wired to real data. The history writing is hand-seeded for three places so you
-can see the finished shape before committing to a live content pipeline.
+Built as a vertical slice, now filled out: the map, the timeline, the panel and
+the routes are all real and wired to real data. Eight places have hand-seeded
+history; everywhere else, a click runs a live Wikipedia + Wikidata lookup, and
+— if you add an API key — a model writes the era dossier from what it finds.
 
 ---
 
@@ -19,7 +20,10 @@ can see the finished shape before committing to a live content pipeline.
 Any static server works. It has to be served over HTTP — the app uses ES
 modules, so opening `index.html` from the filesystem will not work.
 
-No build step, no npm install, no API keys.
+No build step, no npm install. Still no API key required: the grounded lookup
+in every field note is keyless. The optional model-written dossier needs an
+Anthropic key, pasted into the panel behind **Set API key** — it lives in your
+browser's `localStorage` and is sent only to `api.anthropic.com`.
 
 ---
 
@@ -38,17 +42,41 @@ snapshots ship here, simplified, in `data/eras/`. Four extra stops
 boundary data, because none exists that far back and pretending otherwise would
 be a lie.
 
-**The sea-level effect** is the cheapest impressive thing in the project. The
-continental shelf — the 0–200 m band, built by erasing Natural Earth's 200 m
-bathymetry contour from its 0 m one — is rendered as water or as dry ground
-depending on where the timeline sits. Scrub to the Last Glacial Maximum and
-Doggerland, Sundaland, Beringia and the Sahul shelf all surface at once, because
-they are all the same shallow-shelf effect.
+**The paleo-coastline** is DEM-based now. A MapLibre `color-relief` layer
+(`paleo-sea` in `src/style.js`) reads the same Mapzen elevation tiles the 3D
+relief uses and floods everything below the selected era's sea level; the ramp
+is rewritten every time the timeline moves (`applySeaLevel` in `src/app.js`).
+Scrub to the Last Glacial Maximum and Doggerland, Sundaland, Beringia and the
+Sahul shelf emerge from their *actual* topography — anything between about
+−130 m and 0 — not from a single hand-drawn contour. The modern coastline and
+the shallow-water tint fade out as the sea drops so the DEM-drawn coast is the
+one you read. If the elevation tiles are unreachable it falls back to the old
+proxy: the 0–200 m continental-shelf polygon, shown as water or dry ground.
 
-The sea-level curve in `src/eras.js` is a coarse approximation: +6 m at the last
-interglacial highstand, −125 m at the LGM, back to zero through the Holocene.
-The shelf polygon is the 200 m contour rather than the ~125 m one the physics
-wants, so treat the effect as indicative. It is labelled that way in the UI.
+The sea-level curve in `src/eras.js` is resampled from published
+reconstructions — Spratt & Lisiecki 2016 and Lambeck et al. 2014 — so the
+timing is right: the Eemian highstand near +7 m at ~125 ka, the ~−130 m floor
+at the LGM, Meltwater Pulse 1A around 14.5 ka, the Younger Dryas pause. It is
+still one global curve and hides big regional differences from glacial isostasy;
+treat it as indicative, as the UI says.
+
+**Routes and movement** (`src/routes.js`, `data/routes.json`) are seven coarse
+schematic corridors — Out of Africa, the Austronesian expansion, the Silk Road,
+the maritime spice route, trans-Saharan routes, the Columbian exchange, the
+transatlantic slave trade — each with a `from`/`to` window, so the visible set
+tracks the timeline. Toggle them from the gazetteer; click a line to read what
+it was. They are drawn as a handful of waypoints each: "this corridor mattered",
+not surveyed roads.
+
+**Live dossiers.** Clicking anywhere with no seeded entry still gives a field
+note — mapped polity, the source data's boundary-confidence value, physiographic
+region, sea level, period — but it now also runs a keyless lookup against
+Wikipedia geosearch, the Wikipedia REST summary API and Wikidata
+(`src/lookup.js`), all CORS, cached in `localStorage`. You get the nearest
+article with its extract, its Wikidata facts, and the other named places within
+10 km with bearings. If an Anthropic key is set, a **Write the era dossier**
+button hands that grounding to a model (`src/narrate.js`) which writes in the
+house voice; the result is cached by place + era. No key, no change.
 
 **Labels are HTML, not GL.** No SDF glyph tiles, no glyph server, no baked-in
 font — which means real serif type with real letter-spacing and small-caps, and
@@ -93,34 +121,31 @@ Add the place to `data/places.json`, then add a button in `index.html`:
 <button class="gbtn" data-place="yourkey">Your Place</button>
 ```
 
-Clicking anywhere with no seeded dossier gives a field note instead: what the
-map genuinely knows about that point (mapped polity, the source data's own
-boundary-confidence value, physiographic region, sea level, period) plus a
-copyable research prompt. That's the seam where the live pipeline goes.
+The eight seeded now: Ladakh, Doggerland, Cappadocia, Sundaland, southern
+Mesopotamia, Great Zimbabwe, Cahokia, the Aral Sea.
 
 ---
 
 ## Where this goes next
 
-The obvious next move is replacing hand-seeded dossiers with generated ones.
-The shape that works: on click, hit Wikipedia geosearch + Wikidata + the
-[Pleiades](https://pleiades.stoa.org) gazetteer for the coordinate, hand the
-results and the selected era to a model, cache the answer keyed by
-`place + era`. The field-note panel already prints the prompt for this. Grounding
-it in a real lookup is what keeps it from confabulating, and caching is what
-keeps it affordable — most clicks land on places someone has already opened.
+The live-dossier pipeline, the routes layer and the DEM paleo-coastline are in.
+What's left from the original list:
 
-Other threads worth pulling:
-
+- **Pleiades.** The grounded lookup uses Wikipedia + Wikidata; adding the
+  [Pleiades](https://pleiades.stoa.org) gazetteer would sharpen the classical
+  world specifically. No CORS-friendly spatial endpoint, so it needs a small
+  proxy or a bundled extract.
+- **A dossier proxy.** The model call goes straight from the browser with the
+  user's key. A tiny serverless function would let the site ship its own key,
+  add a shared cache, and drop the `dangerous-direct-browser-access` header.
 - **Deeper time.** [GPlates](https://www.gplates.org) reconstructions push the
   map back tens of millions of years, into continents in different places
   entirely. Different data model, worth its own pass.
-- **Better paleo-coastlines.** A real DEM thresholded at the actual sea level
-  for the selected year, instead of the single 200 m contour used here.
-- **Trade routes and movement.** Static borders undersell it; the Silk Road,
-  Austronesian expansion and the Columbian exchange are all line data.
-- **Two-player.** He said it himself — half the fun is doing this on a call with
-  someone. Shared cursor and shared timeline position is not a big feature.
+- **Sharper paleo-coastlines.** `color-relief` on the Mapzen tiles is real DEM
+  thresholding but the tiles top out at ~z12 and terrarium precision is 1 m
+  steps; a purpose-built low-res bathymetric grid (GEBCO) would do better in the
+  0 to −130 m band that matters here.
+- **Two-player.** Shared cursor and shared timeline position — not a big feature.
 
 ---
 
@@ -133,8 +158,10 @@ Other threads worth pulling:
 | right-drag / ctrl-drag | tilt and rotate |
 | ← / → | step through the timeline |
 | Home / End | jump to either end of time |
-| click the map | dossier or field note |
+| click the map | dossier, or a field note with a live lookup |
+| Routes & movement | toggle the trade / migration corridors; click a line to read it |
 | Wander | fly somewhere worth looking at |
+| Set API key | paste an Anthropic key for model-written era dossiers (optional) |
 
 ---
 
