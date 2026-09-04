@@ -1,0 +1,159 @@
+{
+  "ladakh": {
+    "name": "Ladakh",
+    "subtitle": "The Indus valley, between the Karakoram and the Great Himalaya",
+    "center": [77.58, 34.16],
+    "radiusKm": 300,
+    "flyTo": { "center": [77.4, 34.1], "zoom": 6.3, "pitch": 50, "bearing": -20 },
+    "geology": "<h4>How the ground got here</h4><p>Ladakh sits directly on the <em>Indus–Yarlung suture</em> — the welded seam where the Indian plate finished colliding with Asia around 50 million years ago. The Tethys Ocean used to be here. Its floor was scraped off and stacked into the ridges north of the river; you can find marine fossils and slabs of ancient ocean crust within sight of the road.</p><p>The pale granite spine of the Ladakh Range is the eroded root of a volcanic arc that once stood above that vanished ocean, the way the Andes stand above the Pacific today. The Indus, older than the mountains it cuts through, kept sawing downward as the range rose around it — which is why the valley runs along the seam instead of across it.</p><p class=\"fact\">Everything here is high desert: 3,000–5,500 m, under 100 mm of rain a year. The Himalaya to the south takes the monsoon before it arrives. Water comes from snow and ice, not sky.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -8000,
+        "title": "Ice, and the edge of the possible",
+        "body": "<p class=\"lede\">For most of this stretch Ladakh is at or beyond the limit of where people can live. Glaciers push far down the valleys; the plateau above is cold desert.</p><p>The Tibetan Plateau was reached earlier than anyone expected — the site of <em>Nwya Devu</em> in central Tibet puts people at 4,600 m somewhere between 40,000 and 30,000 years ago. Ladakh's own Palaeolithic record is thin and hard to date: scattered stone tools, and no securely excavated deep sequence yet.</p><p>What Ladakh does have, in extraordinary quantity, is <em>rock art</em>. Thousands of figures are pecked into desert-varnished boulders along the Indus at Domkhar, Khaltse and Alchi — ibex above all, plus hunters, chariots, stupas and later inscriptions. The earliest phases are usually placed in the Neolithic or Bronze Age rather than the Palaeolithic, but the sequence runs for millennia, which makes it one of the longest continuous conversations any people has had with a single set of rocks.</p><div class=\"caution\">Dating rock art is notoriously slippery. Treat the early end of these ranges as argued, not settled.</div>"
+      },
+      {
+        "from": -8000, "to": -1000,
+        "title": "Herders on the Changthang",
+        "body": "<p class=\"lede\">Pastoralism, not farming, is what makes this landscape workable — and the pattern established here has held for thousands of years.</p><p>The Changthang, the high plain running east into Tibet, supports a nomadic herding economy built on yak, sheep and the goat whose winter undercoat becomes <em>pashmina</em>. Where the Indus and its tributaries widen, small irrigated pockets allow barley — the crop that made settled life at this altitude possible at all.</p><p>The ibex carvings multiply through this period. So do chariots, which is interesting: a wheeled vehicle in a valley where wheels are close to useless suggests contact with steppe cultures to the north rather than local use.</p>"
+      },
+      {
+        "from": -1000, "to": 100,
+        "title": "Mon and Dard: the remembered predecessors",
+        "body": "<p class=\"lede\">Ladakhi tradition holds that two populations were here before the Tibetans: the <em>Mon</em> and the <em>Dards</em>.</p><p>The Dards are Indo-Aryan speakers who came up the Indus from the west, from Gilgit and Baltistan. Their descendants — the Brokpa of Dha, Hanu and Garkone in the lower Indus gorge — still speak a Shina-related language and keep distinct rituals, dress and marriage customs.</p><p>\"Mon\" is fuzzier: in Ladakhi usage it names an earlier people, and today also a musician caste. Whether it once described a specific population or was a general Tibetan word for lowlanders is genuinely unresolved.</p><div class=\"caution\">This is a period where oral tradition, later chronicles and thin archaeology disagree. The shape is right; the details are contested.</div>"
+      },
+      {
+        "from": 100, "to": 600,
+        "title": "A crossroads finds the Buddha",
+        "body": "<p class=\"lede\">Buddhism arrives from the west — from Kashmir and Gandhara, not from Tibet, which has not yet converted.</p><p>Ladakh sits where four worlds touch: Kashmir and the Indian plains to the south, Baltistan and Central Asia to the west and north, the Tarim oases of Khotan and Kashgar beyond the Karakoram, and the Tibetan plateau to the east. Kushan-era material turns up here; so do rock-cut Maitreya figures at Mulbekh and Kartse in a plainly Gandharan idiom.</p><p class=\"fact\">Nothing about Ladakh's later Tibetan character was inevitable. For centuries its cultural gravity pulled west and south.</p>"
+      },
+      {
+        "from": 600, "to": 900,
+        "title": "The Tibetan Empire arrives — and everything changes",
+        "body": "<p class=\"lede\">This is the decisive event in Ladakh's history. It stops being a Dardic-Indic borderland and becomes Tibetan.</p><p>From the mid-7th century the Tibetan Empire expands explosively out of the Yarlung valley, taking the western plateau and pushing into the Tarim Basin, where it fights the Tang for control of the Silk Road oases. Ladakh is absorbed. The Tibetan language, the Tibetan script, and eventually Tibetan Buddhism all arrive with imperial administration.</p><p>Then in 842 the empire disintegrates after the assassination of Langdarma. The centre collapses; the periphery is left holding the culture.</p>"
+      },
+      {
+        "from": 900, "to": 1400,
+        "title": "Maryul, and a second beginning for Buddhism",
+        "body": "<p class=\"lede\">Out of the empire's wreckage, a great-grandson of Langdarma named <em>Nyima-Gon</em> moves west and founds a kingdom in Ladakh. It is called Maryul — 'the lowland' — and it is the ancestor of every Ladakhi state since.</p><p>What follows is the <em>phyi dar</em>, the 'later diffusion' of Buddhism, and western Tibet is its engine. The translator <strong>Rinchen Zangpo</strong> (958–1055) is sent to Kashmir, returns with texts and with Kashmiri artists, and is credited with founding monasteries across Ladakh, Zanskar and Spiti.</p><p class=\"fact\">The murals at Alchi Choskhor, painted between roughly the 11th and 13th centuries, are the reason art historians come here. They are Kashmiri in style — the last substantial survival of a tradition that was destroyed in Kashmir itself.</p>"
+      },
+      {
+        "from": 1400, "to": 1650,
+        "title": "The Namgyal kings and the Lion",
+        "body": "<p class=\"lede\">Ladakh's high-water mark as an independent power.</p><p>The Namgyal dynasty is founded around 1460 by Lhachen Bhagan, who reunites a fragmented kingdom. Islam has by now reached Ladakh along the Kashmir trade route and taken firm root downstream in Baltistan and around Kargil — Ladakh becomes, and remains, religiously mixed.</p><p>The peak is <strong>Sengge Namgyal</strong> (r. c. 1616–1642), the 'Lion King', who pushes Ladakh's reach across western Tibet and builds on a scale the kingdom never matched again: the nine-storey palace above Leh, and the monastery at Hemis.</p>"
+      },
+      {
+        "from": 1650, "to": 1830,
+        "title": "A war over Tibet, and a treaty about wool",
+        "body": "<p class=\"lede\">Ladakh overreaches, loses, and is permanently reduced — by a peace treaty about goat hair.</p><p>Ladakhi involvement in Tibetan sectarian politics triggers the Tibet–Ladakh–Mughal war of 1679–1684. Ladakh is invaded, and buys Mughal help from Kashmir at a lasting price. The <em>Treaty of Tingmosgang</em> (1684) fixes the Ladakh–Tibet boundary near Demchok, bars Ladakh from Tibetan affairs, and — the clause that mattered — routes the pashmina wool of western Tibet through Ladakh to Kashmir and nowhere else.</p><p class=\"fact\">That single commercial clause fed the Kashmir shawl industry, which fed a European fashion craze, which is a reason the British later cared about who controlled these valleys at all.</p>"
+      },
+      {
+        "from": 1830, "to": 1947,
+        "title": "Conquest by Jammu, and a border problem that outlives everyone",
+        "body": "<p class=\"lede\">Between 1834 and 1842, the Dogra general <strong>Zorawar Singh</strong> — serving Gulab Singh of Jammu — conquers Ladakh, then Baltistan, then marches into western Tibet, where he is killed at Toyo in 1841.</p><p>Ladakh's independence ends. The 1846 Treaty of Amritsar makes Gulab Singh maharaja of the new princely state of Jammu and Kashmir under British paramountcy, with Ladakh inside it. British surveyors and Moravian missionaries follow; the Leh mission opens in 1885.</p><p>The boundary with Tibet is never properly demarcated on the ground. It is a small omission with a very long tail.</p>"
+      },
+      {
+        "from": 1947, "to": 2100,
+        "title": "The routes close",
+        "body": "<p class=\"lede\">Partition, then two wars, turn a crossroads into a cul-de-sac.</p><p>Ladakh becomes part of Indian-administered Jammu and Kashmir in 1947–48. The 1950s close the Tibet trade; the caravan roads to Yarkand and Lhasa that had run for a thousand years simply stop. The 1962 Sino-Indian war leaves China holding <em>Aksai Chin</em>, the high desert northeast of the Ladakh range, and the Line of Actual Control unsettled to this day.</p><p>Ladakh reopens to outsiders in 1974, this time as a destination rather than a corridor. In 2019 it is separated from Jammu and Kashmir and made a Union Territory in its own right.</p><div class=\"caution\">Boundaries in this region are actively disputed between India, Pakistan and China. Any map of it — including this one — is a claim, not a fact.</div>"
+      }
+    ]
+  },
+
+  "doggerland": {
+    "name": "Doggerland",
+    "subtitle": "The drowned country under the North Sea",
+    "center": [3.0, 54.6],
+    "radiusKm": 480,
+    "flyTo": { "center": [3.0, 54.6], "zoom": 5.1, "pitch": 42, "bearing": 8 },
+    "geology": "<h4>How the ground got here</h4><p>The North Sea basin is shallow — much of it under 40 m, and Dogger Bank itself under 20. That shallowness is the whole story: a sea level fall of a hundred metres, which the ice ages delivered repeatedly, turns the entire basin into dry land.</p><p>During glacial maxima, ice locked up enough water to drop global sea level by around 125 m. Britain stopped being an island and became a peninsula of Europe, and the ground between was not a marginal land bridge but a large, low, well-watered plain crossed by the ancestral Rhine, Thames and Meuse.</p><p class=\"fact\">The land is still moving. Scandinavia, released from its ice load, is rising; southern Britain and the Netherlands are tilting down in response. Sea level here is a moving target on both ends.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -40000,
+        "title": "Neanderthal country",
+        "body": "<p class=\"lede\">Sea level swings through this period, and the basin floods and drains more than once.</p><p>During the last interglacial, around 125,000 years ago, the sea stood a few metres <em>higher</em> than today and Britain was firmly an island. As the climate cooled again the water withdrew and the plain reopened.</p><p>Neanderthals were here. In 2009 a fragment of a Neanderthal skull was identified among material dredged from the Zeeland Ridges off the Dutch coast — the first Neanderthal fossil recovered from the North Sea floor.</p>"
+      },
+      {
+        "from": -40000, "to": -14000,
+        "title": "The Last Glacial Maximum",
+        "body": "<p class=\"lede\">The coldest point, around 20,000 BCE. The map you are looking at is at its most unfamiliar.</p><p>An ice sheet covers Scandinavia and much of Britain. Sea level is roughly 125 m below today's. The southern North Sea is a treeless polar desert of tundra and steppe, cut by braided rivers; the Channel is a valley, not a strait.</p><p class=\"fact\">Scrub the timeline across this period and watch the shelf come up dry: not just here, but Sundaland between Borneo and Malaya, Beringia between Siberia and Alaska, and the land that joined New Guinea to Australia. All of them appear at once, because all of them are the same shallow-shelf effect.</p><p>Human occupation of northern Europe at the maximum is sparse to absent. People are further south, in refugia in Iberia and the Balkans, and will move back north as the ice releases.</p>"
+      },
+      {
+        "from": -14000, "to": -8000,
+        "title": "The richest place in Europe",
+        "body": "<p class=\"lede\">Warming is fast. Tundra becomes birch, then pine and hazel woodland. Reindeer give way to red deer, elk, aurochs and boar. And people come back.</p><p>This is Doggerland at its peak — a low plain of rivers, lakes, marsh, estuary and coast. Every one of those is a productive Mesolithic environment, and here they are stacked together. It was very probably better country than the uplands that survived as Britain and the Netherlands.</p><p>The evidence arrives by accident, in fishing nets. In 1931 the trawler <em>Colinda</em> pulled a barbed antler point out of a lump of peat off the Leman and Ower Banks — a Mesolithic hunting weapon from land that no longer exists. Trawlers still bring up mammoth, aurochs and deer bone from Dogger Bank.</p><p class=\"fact\">Since the 2000s, Vince Gaffney's team at Bradford has mapped Doggerland's rivers, lakes and coastlines from oil-industry seismic survey data — reconstructing the topography of a drowned country without ever excavating it. Sedimentary ancient DNA is now filling in its vegetation.</p>"
+      },
+      {
+        "from": -8000, "to": -5000,
+        "title": "The drowning",
+        "body": "<p class=\"lede\">Meltwater raises the sea faster than the land can rise to meet it. Doggerland goes under within a few thousand years — fast enough to be lived through.</p><p>The plain becomes an archipelago; the archipelago becomes shoals. Around 6200 BCE the <em>Storegga Slide</em>, an enormous submarine landslide off Norway, sends a tsunami across the northern North Sea and strikes what is left of the Dogger Bank islands, which by then are low and exposed.</p><p>By roughly 6000–5500 BCE the sea has closed behind Britain. Britain becomes an island and its later history — every invasion, every isolation, every Channel crossing — starts running on different rules.</p><div class=\"caution\">Exact dates for the final separation are debated and keep moving as new cores are dated. Read the century figures as approximate.</div>"
+      },
+      {
+        "from": -5000, "to": 2100,
+        "title": "Sea",
+        "body": "<p class=\"lede\">From here on, Doggerland exists only as bathymetry, as bone in trawl nets, and as seismic lines in an oil company's archive.</p><p>Dogger Bank stays shallow enough to be one of the great fishing grounds of Europe, and shallow enough, now, to be covered in wind turbines whose foundation surveys are quietly producing some of the best archaeology anyone has of the place.</p><p class=\"fact\">Roughly one in ten of the world's currently inhabited coastal cities sits on ground that was dry plain, then seabed, then something in between. Doggerland is the best-studied case of a process that happened on every shallow shelf on Earth.</p>"
+      }
+    ]
+  },
+
+  "cappadocia": {
+    "name": "Cappadocia",
+    "subtitle": "Volcanic tableland in the heart of Anatolia",
+    "center": [34.85, 38.65],
+    "radiusKm": 200,
+    "flyTo": { "center": [34.85, 38.62], "zoom": 6.8, "pitch": 52, "bearing": -12 },
+    "geology": "<h4>How the ground got here</h4><p>Three volcanoes — Erciyes, Hasan Dağı and Göllü Dağ — buried this plateau in ash. Over roughly the last ten million years, successive eruptions laid down thick sheets of <em>ignimbrite</em>: welded volcanic ash, soft enough to carve with hand tools, hard enough to stand up.</p><p>Harder basalt caps protected columns of the softer tuff beneath while everything around them eroded. What survives are the <em>peribacaları</em>, the fairy chimneys — a landform that exists because two rock types weather at different speeds.</p><p class=\"fact\">The same softness explains almost everything human here. If you can dig a house with a pick, you dig a house. Cappadocians have been carving dwellings, churches, stables, storerooms and entire multi-level underground cities out of this rock for at least three thousand years, and the region's dovecotes and cellars are still cut into it.</p>",
+    "entries": [
+      {
+        "from": -200000, "to": -10000,
+        "title": "Obsidian country",
+        "body": "<p class=\"lede\">Before Cappadocia is anything else, it is a source of the best cutting edge available in the ancient Near East.</p><p>The volcanic complex at <em>Göllü Dağ</em>, and nearby Nenezi Dağ, produce obsidian — volcanic glass that fractures to an edge sharper than surgical steel. Palaeolithic groups are working it here long before farming.</p><p>Obsidian is geochemically fingerprintable, so its trade can be traced exactly. Cappadocian obsidian turns up hundreds of kilometres away, and its distribution is one of the clearest maps we have of Stone Age exchange networks.</p>"
+      },
+      {
+        "from": -10000, "to": -3000,
+        "title": "Aşıklı Höyük and the first villages",
+        "body": "<p class=\"lede\">Some of the earliest settled communities anywhere are on this plateau.</p><p><strong>Aşıklı Höyük</strong>, on the Melendiz river near Aksaray, is occupied from about 8200 BCE: a dense cluster of mudbrick houses entered through the roof, with the dead buried beneath the floors. It records, in stratigraphy, the shift from hunting to managing sheep and goats.</p><p>Cappadocian obsidian now reaches Cyprus and the southern Levant, including Jericho. Fifty kilometres southwest, Çatalhöyük becomes the largest known Neolithic settlement in the world; one of its wall paintings has long been read as a townscape beneath an erupting Hasan Dağı, which would make it the oldest landscape picture ever found.</p><div class=\"caution\">That reading of the Çatalhöyük painting is disputed — many archaeologists see a leopard skin and a geometric pattern rather than a volcano and a map.</div>"
+      },
+      {
+        "from": -3000, "to": -1650,
+        "title": "Kaneš: writing arrives in a merchant's ledger",
+        "body": "<p class=\"lede\">Anatolia's first written records are not royal proclamations. They are business correspondence.</p><p>From roughly 1950 to 1750 BCE, merchants from Aššur in northern Mesopotamia run a trading colony — a <em>kārum</em> — outside the Anatolian city of Kaneš, modern <strong>Kültepe</strong> near Kayseri. They bring tin and fine textiles by donkey caravan and take back silver and gold.</p><p class=\"fact\">More than 23,000 cuneiform tablets have come out of Kültepe: contracts, loans, lawsuits, tax disputes, and letters between husbands in Anatolia and wives running the business back in Aššur. It is one of the richest windows into ordinary Bronze Age life anywhere on Earth, and it exists because a group of merchants were meticulous about their paperwork.</p>"
+      },
+      {
+        "from": -1650, "to": -550,
+        "title": "Hittites, and the long unravelling",
+        "body": "<p class=\"lede\">Cappadocia is core territory of the Hittite Empire, the Bronze Age power that fought Egypt to a draw at Kadesh and signed the earliest surviving peace treaty between two states.</p><p>The capital is Hattusa, north of here. Around 1180 BCE the empire falls apart in the general Late Bronze Age collapse that takes down half the eastern Mediterranean at once.</p><p>What survives in and around Cappadocia are the Neo-Hittite successor states — <em>Tabal</em> among them — writing in Luwian hieroglyphs, holding out against Assyria, and eventually absorbed.</p>"
+      },
+      {
+        "from": -550, "to": 17,
+        "title": "Katpatuka",
+        "body": "<p class=\"lede\">The name itself is Persian. Under the Achaemenids this is the satrapy of <em>Katpatuka</em>, which Greek speakers render as Kappadokia and which we still say today.</p><p>The Royal Road from Sardis to Susa runs across Anatolia, and Cappadocia is horse country — the satrapy's tribute is reckoned partly in horses.</p><p>After Alexander, the region does something unusual: rather than becoming a Macedonian kingdom it stays under a local dynasty, the Ariarathids, who rule an independent Kingdom of Cappadocia for two and a half centuries while playing Seleucids, Pontus and then Rome against each other with considerable skill.</p>"
+      },
+      {
+        "from": 17, "to": 650,
+        "title": "Rome, and three theologians",
+        "body": "<p class=\"lede\">Tiberius annexes the kingdom as a Roman province in 17 CE. Five centuries later Cappadocia is one of the most consequential places in Christian thought.</p><p>The <strong>Cappadocian Fathers</strong> — Basil of Caesarea, his brother Gregory of Nyssa, and Gregory of Nazianzus — write in the second half of the 4th century and effectively settle the Trinitarian language the Council of Constantinople adopts in 381. Basil also organises monasticism into a communal rule, and founds the <em>Basileias</em>, a complex outside Caesarea combining hospital, hostel and poorhouse that is often called the first hospital.</p><p class=\"fact\">Basil's rule shaped eastern monasticism, and through it Benedict, and through Benedict most of western monasticism. That lineage starts on this plateau.</p>"
+      },
+      {
+        "from": 650, "to": 1071,
+        "title": "The frontier goes underground",
+        "body": "<p class=\"lede\">For four centuries Cappadocia is the Byzantine–Arab military frontier, raided almost annually. The response is written into the rock.</p><p>The underground complexes at <strong>Derinkuyu</strong> and <strong>Kaymaklı</strong> — earlier cuttings, dramatically enlarged in this period — descend many levels, with ventilation shafts, wells, stables, chapels, wineries and rolling stone doors that seal from the inside. They are not cities in the sense of permanent homes; they are refuges designed to hide a whole community and its animals until a raiding column moves on.</p><p>Rock-cut churches multiply across the valleys. So does a dispersed, defensible pattern of settlement that suits a landscape where the safest structure is the one you cannot see.</p>"
+      },
+      {
+        "from": 1071, "to": 1400,
+        "title": "Seljuk Anatolia and the painted churches",
+        "body": "<p class=\"lede\">The Byzantine defeat at Manzikert in 1071 opens Anatolia to the Turks. Cappadocia passes to the Sultanate of Rum, ruled from Konya.</p><p>What follows is less a rupture than a long overlap. Christian communities remain, and the finest painted churches of Göreme — the Karanlık Kilise among them — belong to roughly this era, their Byzantine programmes executed under Seljuk rule.</p><p>The Seljuks build caravanserais a day's march apart along the trade roads; Sultanhanı, north of Aksaray, dates to 1229. The region is a corridor again.</p>"
+      },
+      {
+        "from": 1400, "to": 1900,
+        "title": "Ottoman centuries",
+        "body": "<p class=\"lede\">Under the Ottomans Cappadocia is quiet provincial country: wine, horses, wheat, pigeon manure for the vineyards, and stone cut from the same tuff everyone has always cut.</p><p>Its Orthodox Christian population persists for another five hundred years. Many of them speak Turkish rather than Greek and write it in the Greek alphabet — the <em>Karamanlides</em>. Villages like Sinasos, now Mustafapaşa, grow prosperous on trade with Istanbul and build handsome stone mansions that still stand.</p>"
+      },
+      {
+        "from": 1900, "to": 2100,
+        "title": "An emptying, and an afterlife",
+        "body": "<p class=\"lede\">The 1923 Greco-Turkish population exchange ends the Orthodox presence in Cappadocia after roughly two thousand years.</p><p>Whole villages are emptied and resettled by Muslims arriving from Greece. The rock churches are abandoned to pigeons and to storage; some are used as dovecotes, which is part of why their paintings survived at all.</p><p>Göreme and the surrounding valleys are inscribed on the UNESCO World Heritage list in 1985. The cave dwellings that people spent three millennia carving are now, in a turn nobody could have predicted, hotel rooms.</p>"
+      }
+    ]
+  }
+}
