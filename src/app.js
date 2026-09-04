@@ -9,6 +9,7 @@ import * as Dossier from './dossier.js';
 import { initSettings } from './settings.js';
 import { Routes } from './routes.js';
 import { Ambience, labelFor } from './ambience.js';
+import { audioState, unlock, setVolume } from './haptics.js';
 
 const USE_TERRAIN = true;   // set false if the elevation tiles are unreachable
 
@@ -337,9 +338,20 @@ map.on('load', async () => {
   let ambienceExplained = false;
   if (aBtn) aBtn.onclick = () => {
     const on = !ambience.on;
+    if (on && unlock() === 'unsupported'){
+      toast('This browser exposes no Web Audio — ambience unavailable');
+      return;
+    }
     ambience.setEnabled(on);
     aBtn.classList.toggle('on', on);
     if (!on){ toast('ambience off'); return; }
+    // If the context is still not running, autoplay policy ate it — say so
+    // rather than leaving a lit button and silence.
+    setTimeout(() => {
+      const s = audioState();
+      if (ambience.on && s.state !== 'running')
+        toast('Audio is blocked by the browser — click the page once, then try again');
+    }, 400);
     if (!ambienceExplained){
       ambienceExplained = true;
       // Say what this is before it plays. Synthesised ≠ traditional music.
@@ -350,7 +362,25 @@ map.on('load', async () => {
     }
   };
 
-  window.atlas = { map, timeline, labels, routes, goToPlace };
+  // Console handle, plus a self-test for the three things that fail silently:
+  // audio (autoplay policy), imagery (a stale lookup cache) and the detail
+  // layers (a fetch that never happened).  atlas.diag() in the console.
+  window.atlas = {
+    map, timeline, labels, routes, ambience, detail, goToPlace,
+    setVolume,
+    diag: async () => {
+      const a = audioState();
+      const ground = Object.keys(localStorage).filter(k => k.startsWith('atlas.ground.'));
+      const r = { audio: a, ambienceOn: ambience.on, region: ambience.key,
+                  groundCacheEntries: ground.length,
+                  detailLayers: detail ? detail.state : null,
+                  zoom: +map.getZoom().toFixed(2), year: timeline.stop.y };
+      console.table(r.audio);
+      console.log('atlas diag', r);
+      return r;
+    },
+    testTone: () => { unlock(); import('./haptics.js').then(h => h.tick({ strong: true })); },
+  };
 
   updateHud();
   setTimeout(() => {

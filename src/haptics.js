@@ -9,6 +9,7 @@
 // inside a real gesture, so autoplay policy is satisfied.
 
 let ctx = null;
+let master = null;
 let noiseBuf = null;
 let enabled = true;
 let lastAt = 0;
@@ -18,6 +19,13 @@ function audio(){
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return null;
   try { ctx = new AC(); } catch { return null; }
+
+  // Everything in the app goes through one master gain so levels are tunable
+  // in one place and nothing can independently get loud.
+  master = ctx.createGain();
+  master.gain.value = 0.85;
+  master.connect(ctx.destination);
+
   // A tiny burst of white noise, reused for every click.
   const n = Math.floor(ctx.sampleRate * 0.05);
   noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate);
@@ -26,8 +34,34 @@ function audio(){
   return ctx;
 }
 
+// Where every voice in the app should connect, instead of ctx.destination.
+export function out(){ audio(); return master; }
+
 export function setEnabled(v){ enabled = !!v; }
 export function isEnabled(){ return enabled; }
+export function setVolume(v){ if (out()) master.gain.value = Math.max(0, Math.min(1, v)); }
+
+// Create and resume the context on the first real gesture, so the first thing
+// the user actually triggers isn't swallowed by autoplay policy. Returns the
+// context state for diagnostics.
+export function unlock(){
+  const c = audio();
+  if (!c) return 'unsupported';
+  if (c.state === 'suspended') c.resume().catch(() => {});
+  return c.state;
+}
+if (typeof window !== 'undefined'){
+  const once = () => { unlock(); window.removeEventListener('pointerdown', once); window.removeEventListener('keydown', once); };
+  window.addEventListener('pointerdown', once, { passive: true });
+  window.addEventListener('keydown', once, { passive: true });
+}
+
+export function audioState(){
+  return { supported: !!(window.AudioContext || window.webkitAudioContext),
+           created: !!ctx, state: ctx?.state ?? null,
+           masterGain: master?.gain.value ?? null, enabled,
+           vibrate: !!navigator.vibrate };
+}
 
 // A detent: something moved one notch.
 export function tick({ strong = false } = {}){
@@ -44,6 +78,7 @@ export function tick({ strong = false } = {}){
   if (!c) return;
   if (c.state === 'suspended') c.resume().catch(() => {});
   const t = c.currentTime;
+  const bus = master;
 
   // Body: filtered noise, very short — the "wood" of the click.
   const src = c.createBufferSource();
@@ -54,11 +89,11 @@ export function tick({ strong = false } = {}){
   bp.Q.value = 1.6;
   const g = c.createGain();
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(strong ? 0.11 : 0.055, t + 0.002);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
-  src.connect(bp).connect(g).connect(c.destination);
+  g.gain.exponentialRampToValueAtTime(strong ? 0.5 : 0.28, t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+  src.connect(bp).connect(g).connect(bus);
   src.start(t);
-  src.stop(t + 0.06);
+  src.stop(t + 0.07);
 
   // Transient: a pitched blip so it reads as mechanical, not as static.
   const o = c.createOscillator();
@@ -67,11 +102,11 @@ export function tick({ strong = false } = {}){
   o.frequency.exponentialRampToValueAtTime(strong ? 180 : 300, t + 0.03);
   const og = c.createGain();
   og.gain.setValueAtTime(0.0001, t);
-  og.gain.exponentialRampToValueAtTime(strong ? 0.05 : 0.03, t + 0.003);
-  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
-  o.connect(og).connect(c.destination);
+  og.gain.exponentialRampToValueAtTime(strong ? 0.26 : 0.16, t + 0.003);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
+  o.connect(og).connect(bus);
   o.start(t);
-  o.stop(t + 0.07);
+  o.stop(t + 0.08);
 }
 
 // Shared context so ambience.js doesn't open a second one.

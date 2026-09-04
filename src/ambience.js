@@ -11,7 +11,7 @@
 // tanpura-ish fifth in South Asia. It is evocative, not authentic, and the UI
 // says so. The point is that the room changes when you move.
 
-import { sharedContext } from './haptics.js';
+import { sharedContext, out as audioOut } from './haptics.js';
 
 // Scales are semitone offsets from the tonic. Non-integers are deliberate:
 // slendro is not a 12-tone-equal subset and rounding it to one loses the
@@ -165,18 +165,18 @@ export class Ambience {
     const t = c.currentTime;
     const gain = c.createGain();
     gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.linearRampToValueAtTime(0.055, t + 2.2);
+    gain.gain.linearRampToValueAtTime(0.26, t + 0.9);
 
     const lp = c.createBiquadFilter();
     lp.type = 'lowpass';
-    lp.frequency.value = 520;
+    lp.frequency.value = 760;
     lp.Q.value = 0.6;
 
     // Slow filter breathing so the drone is never quite static.
     const lfo = c.createOscillator();
     lfo.frequency.value = 0.05 + Math.random() * 0.04;
     const lfoGain = c.createGain();
-    lfoGain.gain.value = 130;
+    lfoGain.gain.value = 190;
     lfo.connect(lfoGain).connect(lp.frequency);
     lfo.start(t);
 
@@ -189,13 +189,13 @@ export class Ambience {
         o.frequency.value = f;
         o.detune.value = detune;
         const g = c.createGain();
-        g.gain.value = 0.16;
+        g.gain.value = 0.22;
         o.connect(g).connect(lp);
         o.start(t);
         oscs.push(o);
       }
     }
-    lp.connect(gain).connect(c.destination);
+    lp.connect(gain).connect(audioOut() || c.destination);
     return { gain, oscs, lp };
   }
 
@@ -205,7 +205,7 @@ export class Ambience {
     clearInterval(this.timer);
     const R = REGIONS[key];
     const c = this.context; if (!c) return;
-    this.nextAt = c.currentTime + 1.2;
+    this.nextAt = c.currentTime + 0.4;
     this.timer = setInterval(() => {
       if (!this.on) return;
       const now = c.currentTime;
@@ -222,8 +222,8 @@ export class Ambience {
     const oct = [0, 12, 12, 24][Math.floor(Math.random() * 4)];
     const f = R.root * Math.pow(2, (step + oct + R.spread) / 12);
     const g = c.createGain();
-    g.connect(c.destination);
-    const peak = 0.055 + Math.random() * 0.03;
+    g.connect(audioOut() || c.destination);
+    const peak = 0.20 + Math.random() * 0.09;
 
     if (R.voice === 'metal'){
       // Inharmonic FM — struck bronze.

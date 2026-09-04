@@ -6,8 +6,23 @@
 // coarse coordinate, so a second click on the same area is instant and the
 // optional model step (narrate.js) has something solid to stand on.
 
-const CACHE_PREFIX = 'atlas.ground.';
+// Bump the version whenever the shape of a cached record changes. Without
+// this, a browser that used an older build keeps serving records missing the
+// newer fields — which is exactly how the plate strip silently disappeared
+// for anyone who had already clicked around before `images` existed.
+const CACHE_VERSION = 2;
+const CACHE_PREFIX = `atlas.ground.v${CACHE_VERSION}.`;
 const CACHE_TTL = 1000 * 60 * 60 * 24 * 30;   // 30 days
+
+// Drop records written by any earlier version of this module.
+(function evictOldCaches(){
+  try {
+    for (const k of Object.keys(localStorage)){
+      if (k.startsWith('atlas.ground.') && !k.startsWith(CACHE_PREFIX))
+        localStorage.removeItem(k);
+    }
+  } catch {}
+})();
 
 const WP_API   = 'https://en.wikipedia.org/w/api.php';
 const WP_REST  = 'https://en.wikipedia.org/api/rest_v1/page/summary/';
