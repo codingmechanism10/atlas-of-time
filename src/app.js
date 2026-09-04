@@ -7,6 +7,7 @@ import { seaLevelAt, STOPS } from './eras.js';
 import * as Dossier from './dossier.js';
 import { initSettings } from './settings.js';
 import { Routes } from './routes.js';
+import { Ambience, labelFor } from './ambience.js';
 
 const USE_TERRAIN = true;   // set false if the elevation tiles are unreachable
 
@@ -77,6 +78,15 @@ let selectedKey = null;
 let timeline    = null;
 let routes      = null;
 let demOK       = USE_TERRAIN;   // cleared if the elevation tiles fail
+const ambience  = new Ambience();
+
+// Move the room with the selection. Only announces when the region actually
+// changes, so scrubbing around inside one doesn't nag.
+function setAmbienceTo(lngLat){
+  const before = ambience.key;
+  const key = ambience.setPlace(lngLat.lng ?? lngLat[0], lngLat.lat ?? lngLat[1]);
+  if (ambience.on && key !== before) toast(labelFor(key));
+}
 
 // ---------------------------------------------------------------- era load
 
@@ -169,6 +179,8 @@ map.on('click', (e) => {
   // open a field note underneath it.
   if (routes?.visible && map.queryRenderedFeatures(e.point, { layers: ['routes-line'] }).length) return;
 
+  setAmbienceTo(e.lngLat);
+
   const key = placeAt(e.lngLat);
   if (key){
     selectedKey = key;
@@ -238,6 +250,7 @@ function goToPlace(key){
   const p = places[key];
   if (!p) return;
   selectedKey = key;
+  setAmbienceTo(p.center);
   map.flyTo({ ...p.flyTo, speed: 0.75, curve: 1.5 });
   Dossier.showPlace(p, timeline.stop);
 }
@@ -250,6 +263,7 @@ document.getElementById('wander').onclick = () => {
   const w = WANDER[Math.floor(Math.random() * WANDER.length)];
   selectedKey = null;
   Dossier.close();
+  ambience.setPlace(w.c[0], w.c[1]);
   map.flyTo({ center: w.c, zoom: w.z, pitch: 45, bearing: (Math.random()*60 - 30), speed: 0.62, curve: 1.6 });
   toast(w.n);
 };
@@ -302,6 +316,26 @@ map.on('load', async () => {
   if (rBtn) rBtn.onclick = () => {
     const on = routes.toggle();
     rBtn.classList.toggle('on', on);
+  };
+
+  // Ambience is off until asked for — autoplay policy aside, sound you didn't
+  // ask for is rude.
+  ambience.setPlace(map.getCenter().lng, map.getCenter().lat);
+  const aBtn = document.getElementById('ambience-toggle');
+  let ambienceExplained = false;
+  if (aBtn) aBtn.onclick = () => {
+    const on = !ambience.on;
+    ambience.setEnabled(on);
+    aBtn.classList.toggle('on', on);
+    if (!on){ toast('ambience off'); return; }
+    if (!ambienceExplained){
+      ambienceExplained = true;
+      // Say what this is before it plays. Synthesised ≠ traditional music.
+      toast('Synthesised, not recorded — tuning and timbre suggested by the region');
+      setTimeout(() => { if (ambience.on) toast(labelFor(ambience.key)); }, 3200);
+    } else {
+      toast(labelFor(ambience.key));
+    }
   };
 
   window.atlas = { map, timeline, labels, routes, goToPlace };
