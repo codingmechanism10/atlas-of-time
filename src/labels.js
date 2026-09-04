@@ -16,6 +16,14 @@ const CSS = `
   color:#3a2c18;text-shadow:0 1px 0 rgba(247,238,215,.55),0 0 8px rgba(247,238,215,.4)}
 .lab.polity.big{font-size:14px;letter-spacing:.24em}
 .lab.sunk{color:rgba(220,236,242,.72);text-shadow:0 1px 4px rgba(4,18,24,.9)}
+.lab.city{font-size:10.5px;letter-spacing:.07em;color:#2f2413;padding-left:8px;
+  text-shadow:0 1px 0 rgba(247,238,215,.7),0 0 6px rgba(247,238,215,.5)}
+.lab.city::before{content:"";position:absolute;left:0;top:50%;width:3.5px;height:3.5px;
+  margin-top:-1.75px;border-radius:50%;background:#5b4a31;
+  box-shadow:0 0 0 1px rgba(247,238,215,.75)}
+.lab.city.big{font-size:11.5px;letter-spacing:.1em}
+.lab.city.big::before{width:5px;height:5px;margin-top:-2.5px;background:#8a3d1c;
+  box-shadow:0 0 0 1.5px rgba(247,238,215,.8)}
 `;
 
 const PHYSIO_KEEP = new Set([
@@ -33,6 +41,8 @@ export class Labels {
     this.pool = [];
     this.physio = [];
     this.polities = [];
+    this.cities = [];
+    this.year = 2025;
     this.queued = false;
     const tick = () => this.schedule();
     map.on('move', tick); map.on('zoom', tick); map.on('resize', tick);
@@ -85,6 +95,29 @@ export class Labels {
     this.schedule();
   }
 
+  // Cities are modern points. They only appear once you've descended, and only
+  // from 1800 on — a present-day gazetteer over a Bronze Age map would be
+  // fiction. Loaded lazily on first need, like the other detail layers.
+  async loadCities(url){
+    if (this._citiesReq) return this._citiesReq;
+    this._citiesReq = (async () => {
+      try {
+        const gj = await (await fetch(url)).json();
+        this.cities = gj.features.map(f => ({
+          text: f.properties.NAME,
+          lngLat: f.geometry.coordinates,
+          rank: f.properties.RANK ?? 5,
+          capital: !!f.properties.CAPITAL,
+          kind: 'city',
+        }));
+      } catch { this.cities = []; }
+      this.schedule();
+    })();
+    return this._citiesReq;
+  }
+
+  setYear(y){ this.year = y; this.schedule(); }
+
   setSunken(v){ this.sunken = v; this.schedule(); }
 
   schedule(){
@@ -116,6 +149,17 @@ export class Labels {
       candidates.push({ ...p, prio: 500 - p.rank * 10, weight: 1 });
     }
 
+    // Cities sit between polities and physiography in priority: they anchor a
+    // close-up view, but they should never crowd out the polity a reader came
+    // for. Rank gates them in as you descend.
+    if (z >= 4 && this.year >= 1800){
+      for (const p of this.cities){
+        if (p.rank > (z - 3.4) * 2.2) continue;
+        if (angularDist(center, p.lngLat) > limit) continue;
+        candidates.push({ ...p, prio: 800 - p.rank * 12, weight: 2 });
+      }
+    }
+
     candidates.sort((a,b) => (b.weight - a.weight) || (b.prio - a.prio));
 
     // Seed the collision set with the UI's own footprint, read live from the
@@ -133,8 +177,10 @@ export class Labels {
       // handful of candidates survive the bounds test above.
       const back = map.unproject(pt);
       if (angularDist(back, c.lngLat) > 1.5) continue;
-      const big = c.kind === 'polity' ? c.big : c.rank <= 1;
-      const w = c.text.length * (big ? 8.4 : 6.6) + 14;
+      const big = c.kind === 'polity' ? c.big
+                : c.kind === 'city'   ? (c.capital || c.rank <= 1)
+                : c.rank <= 1;
+      const w = c.text.length * (big ? 8.4 : 6.6) + 14 + (c.kind === 'city' ? 10 : 0);
       const h = big ? 22 : 18;
       const box = { x1: pt.x - w/2, y1: pt.y - h/2, x2: pt.x + w/2, y2: pt.y + h/2 };
       if (placed.some(b => overlaps(b, box))) continue;

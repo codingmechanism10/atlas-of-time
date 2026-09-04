@@ -1,6 +1,7 @@
 // app.js — wiring.
 
-import { buildStyle, polityColor, paleoRamp } from './style.js';
+import { buildStyle, polityColor, paleoRamp, C } from './style.js';
+import { Detail } from './detail.js';
 import { Labels } from './labels.js';
 import { Timeline } from './timeline.js';
 import { seaLevelAt, STOPS } from './eras.js';
@@ -77,6 +78,7 @@ let places      = {};
 let selectedKey = null;
 let timeline    = null;
 let routes      = null;
+let detail      = null;
 let demOK       = USE_TERRAIN;   // cleared if the elevation tiles fail
 const ambience  = new Ambience();
 
@@ -108,6 +110,8 @@ async function applyEra(stop){
   labels.setPolities(gj);
   applySeaLevel(stop.y);
   routes?.setYear(stop.y);
+  detail?.setYear(stop.y);
+  labels.setYear(stop.y);
   if (selectedKey && places[selectedKey]) Dossier.showPlace(places[selectedKey], stop);
   prefetchNeighbours();
 }
@@ -229,6 +233,8 @@ const hudCoords = document.getElementById('hud-coords');
 
 function updateHud(){
   const z = map.getZoom();
+  detail?.update();
+  if (z >= 4 && timeline && timeline.stop.y >= 1800) labels.loadCities('data/base/cities.geojson');
   const globe = z < 5.2;
   hudMode.textContent = globe ? 'Globe' : 'Atlas';
   hudHint.textContent = globe ? 'scroll to descend' : 'right-drag to tilt';
@@ -302,6 +308,9 @@ map.on('load', async () => {
 
   places = await (await fetch('data/places.json')).json();
   await labels.loadPhysio('data/base/physio.geojson');
+
+  detail = new Detail(map, C);
+  detail.onNote = (m) => toast(m);
 
   timeline = new Timeline((stop) => { applyEra(stop); });
   initSettings();
