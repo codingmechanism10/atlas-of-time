@@ -182,6 +182,17 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--sea-ab
   color:var(--gold-dim);margin:20px 0 8px;padding-top:14px;border-top:1px solid rgba(120,100,66,.26)}
 #d-body .ai-body{font-size:13.5px;line-height:1.66}
 
+.gbtn.on{background:rgba(45,35,24,.92);border-color:var(--gold);color:#fff3d8}
+
+/* ---------- routes note ---------- */
+#routes-note{position:absolute;left:50%;transform:translateX(-50%);bottom:182px;z-index:9;
+  width:460px;max-width:calc(100% - 40px);
+  background:rgba(23,19,16,.94);border:1px solid rgba(201,167,101,.3);
+  color:#e6d6b0;font-family:var(--sans);font-size:11.5px;line-height:1.62;letter-spacing:.02em;
+  padding:12px 15px;opacity:0;transition:.3s;pointer-events:none}
+#routes-note.show{opacity:1;pointer-events:auto;cursor:pointer}
+@media (max-width:760px){ #routes-note{width:auto;left:16px;right:16px;transform:none;bottom:auto;top:120px} }
+
 /* ---------- settings ---------- */
 #settings{position:absolute;inset:0;z-index:12;background:rgba(10,7,4,.62);
   display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
@@ -256,6 +267,7 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--sea-ab
   <button class="gbtn" data-place="great-zimbabwe">Great Zimbabwe</button>
   <button class="gbtn" data-place="cahokia">Cahokia</button>
   <button class="gbtn" data-place="aral">The Aral Sea</button>
+  <button class="gbtn" id="routes-toggle">Routes &amp; movement</button>
   <button class="gbtn wander" id="wander">Wander &rarr;</button>
   <button class="gbtn sub" id="settings-btn">Set API key ·</button>
 </div>

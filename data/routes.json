@@ -1,0 +1,121 @@
+{
+  "type": "FeatureCollection",
+  "note": "Coarse, hand-drawn schematic paths — a few waypoints each, meant to read as 'this corridor mattered', not as surveyed roads. from/to are the timeline years the path is shown between.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Out of Africa",
+        "kind": "migration",
+        "from": -120000, "to": -9000,
+        "note": "The spread of Homo sapiens out of Africa: up the Nile and across the Bab-el-Mandeb, then east along the coast to South Asia and Sunda, north into Central Asia and Europe, and finally across Beringia into the Americas."
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [[32, 5], [33, 15], [38, 20], [43, 13], [57, 25], [70, 22], [88, 20], [100, 12], [108, 3], [122, -6], [135, -18]],
+          [[38, 20], [36, 33], [30, 42], [20, 48], [10, 47], [2, 44]],
+          [[57, 25], [62, 40], [70, 48], [86, 52], [104, 50], [120, 45], [128, 52], [160, 66], [190, 66], [205, 60], [250, 48], [262, 30], [270, 12], [283, -20], [292, -40], [-65, -52]]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Austronesian expansion",
+        "kind": "migration",
+        "from": -3500, "to": 1400,
+        "note": "Farmer-navigators out of Taiwan through the Philippines and island Southeast Asia — west across the whole Indian Ocean to Madagascar, east through the Bismarcks to Fiji and on to Hawaiʻi, Rapa Nui and Aotearoa. The widest reach of any premodern language family."
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [[121, 24], [122, 14], [125, 7], [118, 1], [117, -4], [120, -5]],
+          [[117, -4], [106, -6], [98, 4], [80, 7], [73, 6], [55, -12], [47, -19]],
+          [[120, -5], [131, -1], [145, -5], [152, -5], [160, -9], [178, -18], [-175, -14], [-160, -18], [-150, -17]],
+          [[-160, -18], [-155, 20]],
+          [[-150, -17], [-130, -27], [-109, -27]],
+          [[-175, -18], [-178, -38], [174, -41]]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "The Silk Road",
+        "kind": "overland",
+        "from": -130, "to": 1500,
+        "note": "The overland caravan corridor linking Han and then Tang China to Central Asia, Persia and the Mediterranean. Silk east to west, horses and silver west to east, and — riding along with the freight — Buddhism, paper, and the Black Death."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[109, 34], [103, 37], [95, 40], [87, 42], [80, 40], [75, 40], [69, 39], [64, 39], [58, 37], [52, 36], [47, 34], [44, 33], [38, 37], [36, 36]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "The maritime spice route",
+        "kind": "maritime",
+        "from": -100, "to": 1600,
+        "note": "The monsoon-timed sea road: Chinese and Southeast Asian ports through the Strait of Malacca to Sri Lanka and the Malabar coast, then to the Persian Gulf and up the Red Sea for Alexandria. Cheaper by the tonne than the overland road, and it carried far more."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[113, 23], [110, 16], [105, 6], [100, 3], [96, 6], [88, 8], [80, 7], [76, 10], [72, 15], [60, 22], [56, 25], [52, 27], [43, 13], [38, 20], [34, 28], [32, 30]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Trans-Saharan routes",
+        "kind": "overland",
+        "from": 700, "to": 1700,
+        "note": "Camel caravans crossing the desert between the Maghreb and the Sahel: West African gold and enslaved people north, Saharan salt and Mediterranean goods south. The wealth that built Timbuktu, Gao and Kano."
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [[-4, 31], [-5, 27], [-3, 23], [-3, 17], [-3, 14]],
+          [[3, 13], [8, 17], [9, 27], [10, 32]],
+          [[-3, 14], [3, 13], [8, 12]]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "The Columbian exchange",
+        "kind": "maritime",
+        "from": 1492, "to": 1800,
+        "note": "The Atlantic crossings that joined two biospheres — maize, potato, tomato and cacao east; wheat, cattle, horses, sugar and smallpox west — plus the Manila galleon, which closed the loop across the Pacific from Acapulco to the Philippines."
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [[-9, 37], [-20, 30], [-40, 22], [-60, 16], [-70, 19]],
+          [[-9, 38], [-25, 15], [-38, -5], [-43, -13]],
+          [[-100, 17], [-140, 15], [-170, 13], [-190, 14], [-235, 14.6]]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "The transatlantic slave trade",
+        "kind": "forced",
+        "from": 1500, "to": 1870,
+        "note": "The forced deportation by sea of roughly twelve million enslaved Africans — mainly from the Bights of Benin and Biafra and from west-central Africa — to plantation economies in Brazil, the Caribbean and North America. Shown because any honest map of movement has to include the movement that was not chosen."
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [[3, 6], [-10, 4], [-30, -2], [-38, -8], [-42, -12]],
+          [[3, 6], [-20, 8], [-45, 14], [-62, 16]],
+          [[8, -6], [-15, -10], [-35, -10], [-40, -8]],
+          [[-62, 16], [-72, 20], [-78, 30], [-80, 32]]
+        ]
+      }
+    }
+  ]
+}

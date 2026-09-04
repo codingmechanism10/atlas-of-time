@@ -1,11 +1,12 @@
 // app.js — wiring.
 
-import { buildStyle, polityColor } from './style.js';
+import { buildStyle, polityColor, paleoRamp } from './style.js';
 import { Labels } from './labels.js';
 import { Timeline } from './timeline.js';
 import { seaLevelAt, STOPS } from './eras.js';
 import * as Dossier from './dossier.js';
 import { initSettings } from './settings.js';
+import { Routes } from './routes.js';
 
 const USE_TERRAIN = true;   // set false if the elevation tiles are unreachable
 
@@ -62,6 +63,8 @@ const eraCache  = new Map();
 let places      = {};
 let selectedKey = null;
 let timeline    = null;
+let routes      = null;
+let demOK       = USE_TERRAIN;   // cleared if the elevation tiles fail
 
 // ---------------------------------------------------------------- era load
 
@@ -82,6 +85,7 @@ async function applyEra(stop){
   map.getSource('era')?.setData(gj);
   labels.setPolities(gj);
   applySeaLevel(stop.y);
+  routes?.setYear(stop.y);
   if (selectedKey && places[selectedKey]) Dossier.showPlace(places[selectedKey], stop);
   prefetchNeighbours();
 }
@@ -95,18 +99,30 @@ function prefetchNeighbours(){
   });
 }
 
-// The shelf polygon is the -200 m contour, so treat it as a proxy: the more
-// the sea falls, the more of it reads as dry ground. Approximate on purpose.
+// Two things move with the sea level now:
+//   1. paleo-sea (color-relief) floods the real DEM below `sl` — this is the
+//      actual paleo-coastline, and it does the heavy lifting.
+//   2. the shelf polygon stays as a warm "recently exposed seafloor" wash and
+//      the modern coastline + shallow-water tint fade out as the sea drops,
+//      so the DEM-drawn coast is the one you read at a glacial low.
 function applySeaLevel(year){
   const sl = seaLevelAt(year);
-  const exposure = Math.max(0, Math.min(1, -sl / 125));
+
+  if (demOK && map.getLayer('paleo-sea'))
+    map.setPaintProperty('paleo-sea', 'color-relief-color', paleoRamp(sl));
+
+  // 0 at a modern sea level, 1 once it has dropped ~35 m.
+  const submerge = Math.max(0, Math.min(1, -sl / 35));
+  const exposure = Math.max(0, Math.min(1, -sl / (demOK ? 140 : 125)));
   const eased = Math.pow(exposure, 0.8);
-  map.setPaintProperty('shelf-exposed', 'fill-opacity', eased * 0.95);
-  map.setPaintProperty('shelf-exposed-edge', 'line-opacity', eased * 0.55);
-  // Keep a little shallow-water tint even at the glacial floor: the shelf
-  // edge should still read as a coast, not as a colour boundary.
-  map.setPaintProperty('shelf-water', 'fill-opacity', 0.55 * (1 - eased * 0.88));
-  labels.setSunken(eased > 0.35);
+
+  // With the DEM, the shelf polygon is just a warm wash under the real
+  // flooded coastline; without it, it carries the whole effect.
+  map.setPaintProperty('shelf-exposed', 'fill-opacity', eased * (demOK ? 0.42 : 0.92));
+  map.setPaintProperty('shelf-exposed-edge', 'line-opacity', eased * (demOK ? 0.3 : 0.55));
+  map.setPaintProperty('shelf-water', 'fill-opacity', 0.55 * (1 - submerge * 0.9));
+  map.setPaintProperty('coast', 'line-opacity', 0.8 * (1 - submerge * (demOK ? 0.82 : 0.55)));
+  labels.setSunken(submerge > 0.4);
 }
 
 // ---------------------------------------------------------------- picking
@@ -137,6 +153,10 @@ function physioAt(lngLat){
 }
 
 map.on('click', (e) => {
+  // A click on a visible route line is handled by routes.js — don't also
+  // open a field note underneath it.
+  if (routes?.visible && map.queryRenderedFeatures(e.point, { layers: ['routes-line'] }).length) return;
+
   const key = placeAt(e.lngLat);
   if (key){
     selectedKey = key;
@@ -228,9 +248,12 @@ map.on('error', (e) => {
   const msg = String(e?.error?.message || '');
   console.warn('[atlas] map error:', msg || e, e?.sourceId || '');
   if (msg.includes('elevation-tiles') || e?.sourceId === 'dem'){
-    if (map.getLayer('hillshade')){
+    if (demOK){
+      demOK = false;
       try { map.setTerrain(null); } catch (_) {}
-      map.removeLayer('hillshade');
+      if (map.getLayer('hillshade')) map.removeLayer('hillshade');
+      if (map.getLayer('paleo-sea')) map.removeLayer('paleo-sea');
+      if (timeline) applySeaLevel(timeline.stop.y);   // fall back to the shelf proxy
       toast('relief tiles unreachable — flat atlas');
     }
   }
@@ -256,7 +279,20 @@ map.on('load', async () => {
 
   timeline = new Timeline((stop) => { applyEra(stop); });
   initSettings();
-  window.atlas = { map, timeline, labels, goToPlace };
+
+  routes = new Routes(map);
+  try {
+    await routes.load();
+    routes.setYear(timeline.stop.y);
+  } catch (_){ /* routes are optional chrome */ }
+
+  const rBtn = document.getElementById('routes-toggle');
+  if (rBtn) rBtn.onclick = () => {
+    const on = routes.toggle();
+    rBtn.classList.toggle('on', on);
+  };
+
+  window.atlas = { map, timeline, labels, routes, goToPlace };
 
   updateHud();
   setTimeout(() => {

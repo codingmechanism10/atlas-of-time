@@ -30,6 +30,21 @@ export const POLITY_COLORS = [
   '#8e5b48', '#67628f', '#94794a', '#5b8383', '#a2617c',
 ];
 
+// The color-relief ramp for the paleo-sea layer, centred on a given relative
+// sea level (metres vs. today). Below it, water; a metre or two above it,
+// nothing. Alpha carries the fade so a near-zero sea level is a no-op over
+// the existing ocean.
+export function paleoRamp(sl){
+  return [
+    'interpolate', ['linear'], ['elevation'],
+    sl - 45, 'rgba(19,50,61,0.96)',
+    sl - 8,  'rgba(29,73,86,0.82)',
+    sl - 1,  'rgba(40,99,115,0.42)',
+    sl + 3,  'rgba(40,99,115,0.0)',
+    sl + 60, 'rgba(40,99,115,0.0)',
+  ];
+}
+
 export function polityColor(name){
   if (!name) return POLITY_COLORS[0];
   let h = 0;
@@ -139,6 +154,22 @@ export function buildStyle({ terrain = true } = {}){
         'line-width': ['interpolate',['linear'],['zoom'], 1,0.5, 5,1.1, 9,1.8],
       } },
   );
+
+  // Paleo-coastline. A color-relief layer reads the real elevation tiles and
+  // floods everything below the selected era's sea level — so at the glacial
+  // maximum Doggerland, Sundaland, Beringia and the Sahul shelf go dry because
+  // their actual topography sits between −130 m and 0, not because of a single
+  // hand-drawn contour. The ramp is rewritten as the timeline moves
+  // (see applySeaLevel in app.js). Needs the DEM, so it rides with `terrain`.
+  if (terrain){
+    layers.push({
+      id:'paleo-sea', type:'color-relief', source:'dem',
+      paint:{
+        'color-relief-opacity': 0.92,
+        'color-relief-color': paleoRamp(0),
+      },
+    });
+  }
 
   return {
     version: 8,

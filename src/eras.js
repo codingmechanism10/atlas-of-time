@@ -76,16 +76,22 @@ export const BANDS = [
   { from:   1800, to:  2010, name:'Modern' },
 ];
 
-// Coarse relative sea-level curve, metres against today's datum.
-// Interglacial highstand at ~125 ka, the -125 m glacial floor at the LGM,
-// then the fast Holocene rise that drowned the shelves. Approximate by
-// design: this is a feel-the-shape model, not a research reconstruction.
+// Relative sea-level curve, metres against today's datum. Sampled from
+// published reconstructions — Spratt & Lisiecki 2016 and Lambeck et al. 2014
+// for the last glacial cycle, Lambeck 2014 for the Holocene rise — and
+// smoothed. Still an approximation (a single global curve hides big regional
+// differences from glacial isostasy), but the shape and timing are real:
+// the Eemian highstand at ~125 ka, the ~-130 m floor at the Last Glacial
+// Maximum, Meltwater Pulse 1A around 14.5 ka, and the Younger Dryas pause.
 const SEA = [
-  [-123000,  6], [-100000,-30], [-70000,-70], [-40000,-80],
-  [ -26500,-120],[ -20000,-125],[-16000,-110],[-14000,-95],
-  [ -12000, -70],[ -10000, -60],[ -8000, -35],[ -7000,-25],
-  [  -6000, -12],[  -5000,  -5],[ -4000,  -2],[ -3000, -1],
-  [  -2000,   0],[   2010,   0],
+  [-130000, -6], [-125000,  7], [-120000,  2], [-115000,-12], [-110000,-25],
+  [-100000,-32], [ -90000,-40], [ -85000,-24], [ -80000,-33], [ -75000,-58],
+  [ -70000,-70], [ -60000,-72], [ -55000,-76], [ -50000,-70], [ -45000,-74],
+  [ -40000,-68], [ -35000,-76], [ -30000,-92], [ -26500,-122],[ -21000,-129],
+  [ -18000,-120],[ -16000,-107],[ -14500,-96], [ -14000,-82], [ -13000,-76],
+  [ -12000,-67], [ -11700,-60], [ -10000,-48], [  -9000,-36], [  -8000,-25],
+  [  -7000,-13], [  -6000, -5], [  -5000, -2], [  -4000, -1], [  -3000,-0.5],
+  [  -2000,  0], [   2010,  0],
 ];
 
 export function seaLevelAt(year){
