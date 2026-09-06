@@ -2,6 +2,7 @@
 
 import { buildStyle, polityColor, paleoRamp, C } from './style.js';
 import { Detail } from './detail.js';
+import { Ancient } from './ancient.js';
 import { Labels } from './labels.js';
 import { Timeline } from './timeline.js';
 import { seaLevelAt, STOPS } from './eras.js';
@@ -83,6 +84,7 @@ let selectedKey = null;
 let timeline    = null;
 let routes      = null;
 let detail      = null;
+let ancient     = null;
 let demOK       = USE_TERRAIN;   // cleared if the elevation tiles fail
 const ambience  = new Ambience();
 
@@ -116,6 +118,7 @@ async function applyEra(stop){
   routes?.setYear(stop.y);
   detail?.setYear(stop.y);
   labels.setYear(stop.y);
+  refreshAncient(stop.y);
   if (selectedKey && places[selectedKey]) Dossier.showPlace(places[selectedKey], stop);
   prefetchNeighbours();
 }
@@ -155,6 +158,30 @@ function applySeaLevel(year){
   labels.setSunken(submerge > 0.4);
 }
 
+// Pleiades. Loads the major tier the first time the timeline enters the
+// covered range, and the long tail only on a deep zoom, then hands the
+// era-filtered set to the label engine. Announced once, because a reader
+// should know these are a Mediterranean-weighted gazetteer and not a claim
+// about the whole world at that date.
+let ancientAnnounced = false;
+function refreshAncient(year){
+  if (!ancient) return;
+  if (!ancient.inRange(year)){ labels.setAncient([]); return; }
+
+  const z = map.getZoom();
+  const needAll = z >= 6;
+  const pending = ancient.ensure('major').then(() => needAll && ancient.ensure('all'));
+  pending.then(() => {
+    if (!timeline || !ancient.inRange(timeline.stop.y)) return;
+    const list = ancient.visible(timeline.stop.y, map.getZoom());
+    labels.setAncient(list);
+    if (list.length && !ancientAnnounced){
+      ancientAnnounced = true;
+      toast('Ancient places from Pleiades — click one for its record');
+    }
+  });
+}
+
 // ---------------------------------------------------------------- picking
 
 function kmBetween(a, b){
@@ -188,6 +215,11 @@ map.on('click', (e) => {
   if (routes?.visible && map.queryRenderedFeatures(e.point, { layers: ['routes-line'] }).length) return;
 
   setAmbienceTo(e.lngLat);
+
+  // A named ancient place under the cursor is more specific than the
+  // field note that would otherwise be generated for this coordinate.
+  const anc = ancient?.pick(map, e.point, timeline.stop.y, map.getZoom());
+  if (anc){ selectedKey = null; Dossier.showAncient(anc, timeline.stop); return; }
 
   const key = placeAt(e.lngLat);
   if (key){
@@ -239,6 +271,7 @@ function updateHud(){
   const z = map.getZoom();
   detail?.update();
   if (z >= 4 && timeline && timeline.stop.y >= 1800) labels.loadCities('data/base/cities.geojson');
+  if (timeline) refreshAncient(timeline.stop.y);
   const globe = z < 5.2;
   hudMode.textContent = globe ? 'Globe' : 'Atlas';
   hudHint.textContent = globe ? 'scroll to descend' : 'right-drag to tilt';
@@ -316,6 +349,9 @@ map.on('load', async () => {
   detail = new Detail(map, C);
   detail.onNote = (m) => toast(m);
 
+  ancient = new Ancient();
+  labels.onAncientClick = (p) => Dossier.showAncient(p, timeline.stop);
+
   timeline = new Timeline((stop) => { applyEra(stop); });
   initSettings();
 
@@ -366,7 +402,7 @@ map.on('load', async () => {
   // audio (autoplay policy), imagery (a stale lookup cache) and the detail
   // layers (a fetch that never happened).  atlas.diag() in the console.
   window.atlas = {
-    map, timeline, labels, routes, ambience, detail, goToPlace,
+    map, timeline, labels, routes, ambience, detail, ancient, goToPlace,
     setVolume,
     diag: async () => {
       const a = audioState();

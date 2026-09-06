@@ -24,6 +24,17 @@ const CSS = `
 .lab.city.big{font-size:11.5px;letter-spacing:.1em}
 .lab.city.big::before{width:5px;height:5px;margin-top:-2.5px;background:#8a3d1c;
   box-shadow:0 0 0 1.5px rgba(247,238,215,.8)}
+.lab.ancient{font-size:10px;letter-spacing:.09em;font-style:italic;color:#4a3418;
+  padding-left:9px;pointer-events:auto;cursor:pointer;
+  text-shadow:0 1px 0 rgba(247,238,215,.7),0 0 6px rgba(247,238,215,.5)}
+.lab.ancient::before{content:"";position:absolute;left:1px;top:50%;width:4px;height:4px;
+  margin-top:-2px;transform:rotate(45deg);background:transparent;
+  border:1px solid rgba(90,62,28,.85);box-shadow:0 0 0 1px rgba(247,238,215,.6)}
+.lab.ancient.big{font-size:11.5px;letter-spacing:.13em;color:#3d2a10}
+.lab.ancient.big::before{width:5.5px;height:5.5px;margin-top:-2.75px;
+  background:rgba(122,86,38,.9)}
+.lab.ancient:hover{color:#7a2f10}
+.lab.ancient:hover::before{border-color:#7a2f10;background:#7a2f10}
 `;
 
 const PHYSIO_KEEP = new Set([
@@ -42,8 +53,10 @@ export class Labels {
     this.physio = [];
     this.polities = [];
     this.cities = [];
+    this.ancient = [];
     this.year = 2025;
     this.queued = false;
+    this.onAncientClick = null;
     const tick = () => this.schedule();
     map.on('move', tick); map.on('zoom', tick); map.on('resize', tick);
 
@@ -118,6 +131,10 @@ export class Labels {
 
   setYear(y){ this.year = y; this.schedule(); }
 
+  // Pleiades places for the current era, already era- and rank-filtered by
+  // ancient.js. Passed in rather than loaded here so this stays a renderer.
+  setAncient(list){ this.ancient = list || []; this.schedule(); }
+
   setSunken(v){ this.sunken = v; this.schedule(); }
 
   schedule(){
@@ -160,6 +177,14 @@ export class Labels {
       }
     }
 
+    // Ancient places outrank physiography but yield to polities and cities:
+    // they are the reason you scrubbed to 100 CE, but a wall of them would
+    // bury the empire they sit inside.
+    for (const p of this.ancient){
+      if (angularDist(center, p.lngLat) > limit) continue;
+      candidates.push({ ...p, prio: 700 - p.rank * 40, weight: 2 });
+    }
+
     candidates.sort((a,b) => (b.weight - a.weight) || (b.prio - a.prio));
 
     // Seed the collision set with the UI's own footprint, read live from the
@@ -177,10 +202,12 @@ export class Labels {
       // handful of candidates survive the bounds test above.
       const back = map.unproject(pt);
       if (angularDist(back, c.lngLat) > 1.5) continue;
-      const big = c.kind === 'polity' ? c.big
-                : c.kind === 'city'   ? (c.capital || c.rank <= 1)
+      const big = c.kind === 'polity'  ? c.big
+                : c.kind === 'city'    ? (c.capital || c.rank <= 1)
+                : c.kind === 'ancient' ? c.rank === 0
                 : c.rank <= 1;
-      const w = c.text.length * (big ? 8.4 : 6.6) + 14 + (c.kind === 'city' ? 10 : 0);
+      const dot = (c.kind === 'city' || c.kind === 'ancient') ? 10 : 0;
+      const w = c.text.length * (big ? 8.4 : 6.6) + 14 + dot;
       const h = big ? 22 : 18;
       const box = { x1: pt.x - w/2, y1: pt.y - h/2, x2: pt.x + w/2, y2: pt.y + h/2 };
       if (placed.some(b => overlaps(b, box))) continue;
@@ -205,8 +232,25 @@ export class Labels {
       if (d.textContent !== it.text) d.textContent = it.text;
       d.style.transform = `translate(-50%,-50%) translate(${it.x.toFixed(1)}px,${it.y.toFixed(1)}px)`;
       d.style.opacity = '1';
+      // Nodes are recycled, so the payload has to be rebound every paint.
+      d._item = it;
+      if (it.kind === 'ancient'){
+        d.title = it.text;
+        if (!d._wired){
+          d._wired = true;
+          d.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (d._item?.kind === 'ancient') this.onAncientClick?.(d._item);
+          });
+        }
+      } else if (d.title) {
+        d.removeAttribute('title');
+      }
     });
-    for (let i = items.length; i < this.pool.length; i++) this.pool[i].style.opacity = '0';
+    for (let i = items.length; i < this.pool.length; i++){
+      this.pool[i].style.opacity = '0';
+      this.pool[i]._item = null;
+    }
   }
 }
 

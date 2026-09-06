@@ -13,6 +13,7 @@
 import { formatYear, bandFor, seaLevelAt } from './eras.js';
 import { groundCoordinate, bearing, formatKm } from './lookup.js';
 import { hasKey, narrateDossier, cachedDossier } from './narrate.js';
+import { pleiadesUrl, formatSpan } from './ancient.js';
 
 const el = {
   root  : document.getElementById('dossier'),
@@ -68,6 +69,41 @@ async function fillPlates(token, lat, lng){
 }
 
 // Sepia plates, the way an atlas would bind them in.
+// A Pleiades record. Everything here is attributable: the gazetteer entry
+// itself is a citable URI, and where Pleiades carries a Barrington Atlas
+// reference we print it rather than hiding it behind prose.
+export function showAncient(p, stop){
+  const token = ++fieldToken;
+  el.kicker.textContent = 'Ancient place · Pleiades';
+  el.title.textContent  = p.text;
+  el.sub.textContent    = p.type.replace(/-\d$/, '').replace(/-/g, ' ');
+  el.era.textContent    = eraChip(stop);
+
+  const inEra = stop.y >= p.from && stop.y <= p.to;
+  const parts = [`<div id="d-plates"></div>`];
+
+  parts.push(`<p class="fn-lead">${esc(formatSpan(p.from, p.to))}.
+    ${inEra ? 'Attested at the selected date.'
+            : `<em>Not attested at ${esc(eraChip(stop))}</em> — shown because you asked for it.`}</p>`);
+
+  if (p.desc) parts.push(`<p>${esc(p.desc)}</p>`);
+
+  parts.push(`<h4>Provenance</h4><ul class="fn-facts">`);
+  parts.push(`<li><b>gazetteer</b> <a href="${pleiadesUrl(p.id)}" target="_blank"
+    rel="noopener">Pleiades ${p.id}</a></li>`);
+  if (p.cite) parts.push(`<li><b>cited</b> ${esc(p.cite)}</li>`);
+  parts.push(`<li><b>coordinates</b> ${p.lngLat[1].toFixed(4)}, ${p.lngLat[0].toFixed(4)}</li>`);
+  parts.push(`</ul>`);
+  parts.push(`<p class="fn-src">Pleiades, a community gazetteer of the ancient world
+    (CC&nbsp;BY&nbsp;3.0). Coverage follows the Barrington Atlas — dense around the
+    Mediterranean and Near East, thin elsewhere. Positions are the project's
+    representative point, not a survey.</p>`);
+
+  el.body.innerHTML = parts.join('');
+  open();
+  fillPlates(token, p.lngLat[1], p.lngLat[0]);
+}
+
 function renderPlates(images){
   const shown = images.slice(0, 4);
   if (!shown.length) return '';
