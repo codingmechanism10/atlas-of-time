@@ -1,0 +1,15 @@
+# Netlify / Cloudflare Pages.
+# The app has no build step, so module filenames never change. Code must
+# therefore revalidate on every request, or a deploy leaves returning users
+# with a half-updated module graph.
+/*
+  Cache-Control: no-cache, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Regenerated geometry is versioned by content, not by name — but it changes
+# rarely and is large, so let it sit in the cache for a day.
+/data/*
+  Cache-Control: public, max-age=86400
+/vendor/*
+  Cache-Control: public, max-age=86400

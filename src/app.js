@@ -96,12 +96,44 @@ function setAmbienceTo(lngLat){
   if (ambience.on && key !== before) toast(labelFor(key));
 }
 
+// ---------------------------------------------------------------- loading
+//
+// Every data fetch in the app goes through here. A static atlas that hangs
+// forever on a half-loaded boot is worse than one that says what is missing
+// and draws the rest, so nothing below is allowed to reject silently.
+
+const degraded = new Set();
+
+async function fetchJSON(url, { optional = false } = {}){
+  let r;
+  try {
+    r = await fetch(url);
+  } catch (_) {
+    degraded.add(url);
+    if (optional) return null;
+    throw new Error(`offline — could not fetch ${url}`);
+  }
+  if (!r.ok){
+    degraded.add(url);
+    if (optional) return null;
+    throw new Error(`${url} returned ${r.status}`);
+  }
+  try {
+    return await r.json();
+  } catch (_) {
+    degraded.add(url);
+    if (optional) return null;
+    throw new Error(`${url} is not valid JSON`);
+  }
+}
+
 // ---------------------------------------------------------------- era load
 
 async function loadEra(stop){
   if (!stop.file) return { type:'FeatureCollection', features:[] };
   if (eraCache.has(stop.file)) return eraCache.get(stop.file);
-  const gj = await (await fetch('data/eras/' + stop.file)).json();
+  const gj = await fetchJSON('data/eras/' + stop.file, { optional: true });
+  if (!gj) return { type:'FeatureCollection', features:[] };
   for (const f of gj.features) f.properties._color = polityColor(f.properties.NAME);
   eraCache.set(stop.file, gj);
   return gj;
@@ -331,7 +363,24 @@ map.on('error', (e) => {
   }
 });
 
+// A boot that never finishes is the worst failure mode: the overlay sits at
+// "assembling the world" forever and the user has no idea whether it is slow
+// or broken. Two guards — a hard timeout, and a catch around the whole
+// sequence — make sure the map is always revealed and always says why.
+let booted = false;
+function finishBoot(note){
+  if (booted) return;
+  booted = true;
+  if (note) setTimeout(() => toast(note), 900);
+  boot.classList.add('gone');
+  setTimeout(() => boot.remove(), 800);
+}
+setTimeout(() => {
+  if (!booted) finishBoot('Some layers are still loading or unreachable — the map below is live');
+}, 12000);
+
 map.on('load', async () => {
+ try {
   status.textContent = 'reading the boundaries';
 
   // Real 3D relief, if the elevation tiles came through. This is the payoff
@@ -346,8 +395,10 @@ map.on('load', async () => {
     map.setPaintProperty(id, 'fill-opacity-transition', { duration: 900, delay: 0 }));
   map.setPaintProperty('shelf-exposed-edge', 'line-opacity-transition', { duration: 900, delay: 0 });
 
-  places = await (await fetch('data/places.json')).json();
-  await labels.loadPhysio('data/base/physio.geojson');
+  // Neither of these is load-bearing: without seeded places the gazetteer is
+  // just empty, and without physiography the map loses italic region names.
+  places = (await fetchJSON('data/places.json', { optional: true })) || {};
+  try { await labels.loadPhysio('data/base/physio.geojson'); } catch (_) {}
 
   detail = new Detail(map, C);
   detail.onNote = (m) => toast(m);
@@ -422,8 +473,17 @@ map.on('load', async () => {
   };
 
   updateHud();
-  setTimeout(() => {
-    boot.classList.add('gone');
-    setTimeout(() => boot.remove(), 800);
-  }, 400);
+  setTimeout(() => finishBoot(
+    degraded.size ? `${degraded.size} data file${degraded.size > 1 ? 's' : ''} could not be loaded — the rest of the atlas is live`
+                  : null), 400);
+ } catch (err){
+  // Draw whatever did make it, and say what broke, rather than hanging.
+  console.error('atlas boot failed', err);
+  finishBoot('Boot hit an error: ' + (err?.message || err));
+ }
+});
+
+// A style or tile error after boot should not take the page down silently.
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('atlas: unhandled rejection', e.reason);
 });
