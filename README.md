@@ -11,6 +11,17 @@ history; everywhere else, a click runs a live Wikipedia + Wikidata lookup, and
 
 ---
 
+## Deploying it
+
+Static, no build. Any host works, but the cache headers matter: module
+filenames never change, so code must revalidate or a deploy leaves returning
+users with a half-updated module graph (a fresh `app.js` importing a cached
+`labels.js` fails with `labels.setAncient is not a function`, which reads as a
+code bug and is not). `_headers` covers Netlify and Cloudflare Pages,
+`vercel.json` covers Vercel, `.nojekyll` unblocks GitHub Pages, and `serve.py`
+applies the same policy locally — the stock `python3 -m http.server` does not
+send `Cache-Control` at all, so browsers fall back to heuristic freshness.
+
 ## Running it
 
 ```bash
@@ -82,21 +93,47 @@ article with its extract, its Wikidata facts, and the other named places within
 button hands that grounding to a model (`src/narrate.js`) which writes in the
 house voice; the result is cached by place + era. No key, no change.
 
-**Close-up fidelity** is handled by `src/detail.js`, which loads nothing until
-you descend. Past z3.2 a Natural Earth 50 m coastline swaps in under the coarse
-globe polygon — same fill colour, coarse layers retired by zoom range, so the
-handover is invisible but fjords, deltas and island chains resolve. Past z3.6
-you also get 4,149 states and provinces worldwide (NE 10 m, 2.4 MB, ~683 KB
-gzipped). Cities arrive as a third HTML label class with a dot, rank-gated as
-you zoom.
+**Ancient places** are the fidelity that matters most, and they come from
+[Pleiades](https://pleiades.stoa.org) (CC BY): 32,878 records, each carrying an
+*attestation range*. Roma runs −750…2100, Babylon −2000…1599, Ai Khanoum
+−330…2100 — so places genuinely appear and vanish as you scrub, instead of a
+modern point layer pretending to be ancient. Significance is scored from the
+signals the dataset actually provides (feature type, `connectsWith` centrality,
+attestation span, whether an editor wrote real prose) and bucketed by
+percentile, so rank 0 is a true world-map tier of 131 names. Two lazy tiers:
+1,972 major places once the timeline enters range, all 32,878 past z6, giving
+roughly 600 places on screen at z4 and 25,000 at z9. Click one for its Pleiades
+URI, its Barrington Atlas citation, and how firm the position is — Rome's own
+coordinate is `related`, i.e. derived from associated places, and the panel
+says so. Coverage follows the Barrington Atlas: dense around the Mediterranean
+and Near East, thin elsewhere, and the app says that too.
 
-Both of those last two are **present-day** data, so they are era-gated:
+**Close-up fidelity** is handled by `src/detail.js`, which loads nothing until
+you descend. Three coastline tiers hand off, and only one is ever drawn: the
+coarse globe polygon (~13k vertices), Natural Earth 50 m from z3.2, and NE
+10 m from z6 — 5,042 separate landmasses against 50 m's 1,252, plus 10 m rivers
+and lakes. Same fill colour and zoom-range retirement at each handover, so the
+seam is invisible but fjords, deltas and island chains resolve. Past z3.6 you
+also get 4,149 states and provinces worldwide. Cities arrive as an HTML label
+class with a dot, rank-gated as you zoom.
+
+The provinces and cities are **present-day** data, so they are era-gated:
 provinces from 1900, cities from 1800, and the app says out loud that the
 internal boundaries are reference rather than reconstruction the first time
-they appear. This is the honest ceiling on the "make it look like Google Maps"
-ask — for deep history, sub-national boundaries and settlement gazetteers have
-simply never been digitised globally. The territory polygons are the best that
-exists, and they get vaguer the further back you scrub.
+they appear. For *ancient* settlement the gazetteer is Pleiades, above, which is
+properly time-aware. What still does not exist anywhere is sub-national
+boundaries for deep history — nobody has digitised the world's provinces for
+1450 — so the territory polygons remain the best available, and they get
+vaguer the further back you scrub.
+
+**Nothing asserts without provenance.** The seeded prose carries the
+monographs it was written from and says plainly that it is not peer-reviewed.
+Pleiades records carry their URI and Barrington Atlas citation. Model-written
+dossiers are handed a source-tagged grounding block and six evidence rules —
+no name, date or number that is not in the grounding; general background must
+be wrapped so it renders visibly shaded and cannot pass as evidence about the
+place — and the panel prints every record the model was shown, each a link you
+can open and check.
 
 **Ambience** (`src/ambience.js`) is a drone plus a slow scatter of notes,
 synthesised in the browser from oscillators and noise. No samples, no

@@ -21,7 +21,7 @@ const ALL   = 'data/ancient/pleiades-all.json';
 export const COVERED_FROM = -4000;
 export const COVERED_TO   = 1600;
 
-const F = { id:0, title:1, lng:2, lat:3, from:4, to:5, type:6, rank:7, desc:8, cite:9 };
+const F = { id:0, title:1, lng:2, lat:3, from:4, to:5, type:6, rank:7, desc:8, cite:9, prec:10 };
 
 export class Ancient {
   constructor(){
@@ -46,6 +46,7 @@ export class Ancient {
           from: p[F.from], to: p[F.to],
           type: p[F.type], rank: p[F.rank],
           desc: p[F.desc] || '', cite: p[F.cite] || '',
+          prec: p[F.prec] || 'precise',
           kind: 'ancient',
         }));
         if (tier === 'all') this.all = rows; else this.major = rows;

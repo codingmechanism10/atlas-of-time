@@ -105,7 +105,9 @@ export function showAncient(p, stop){
   parts.push(`<li><b>gazetteer</b> <a href="${pleiadesUrl(p.id)}" target="_blank"
     rel="noopener">Pleiades ${p.id}</a></li>`);
   if (p.cite) parts.push(`<li><b>cited</b> ${esc(p.cite)}</li>`);
-  parts.push(`<li><b>coordinates</b> ${p.lngLat[1].toFixed(4)}, ${p.lngLat[0].toFixed(4)}</li>`);
+  parts.push(`<li><b>coordinates</b> ${p.lngLat[1].toFixed(4)}, ${p.lngLat[0].toFixed(4)}
+    ${p.prec && p.prec !== 'precise'
+      ? `<em>(${p.prec === 'related' ? 'derived from associated places' : 'approximate'})</em>` : ''}</li>`);
   parts.push(`</ul>`);
   parts.push(`<p class="fn-src">Pleiades, a community gazetteer of the ancient world
     (CC&nbsp;BY&nbsp;3.0). Coverage follows the Barrington Atlas — dense around the

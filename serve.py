@@ -17,8 +17,10 @@ import http.server
 import os
 import socketserver
 
-# Long-lived: the geometry only changes when we regenerate it.
-CACHEABLE = ("/data/", "/vendor/")
+# vendor/ is a pinned library — genuinely immutable. data/ is regenerated
+# from upstream dumps now and then, so it must revalidate or a rebuild takes a
+# day to reach anyone; a 304 skips the body, which is where the cost is.
+CACHEABLE = ("/vendor/",)
 ONE_DAY = 86400
 
 
