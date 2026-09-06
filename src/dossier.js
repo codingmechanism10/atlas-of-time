@@ -50,7 +50,8 @@ export function showPlace(place, stop){
   el.title.textContent  = entry.title;
   el.sub.textContent    = place.subtitle;
   el.era.textContent    = eraChip(stop);
-  el.body.innerHTML     = `<div id="d-plates"></div>` + entry.body + place.geology;
+  el.body.innerHTML     = `<div id="d-plates"></div>` + entry.body + place.geology
+                        + renderSources(place.sources);
   open();
 
   // Seeded places get the same live plate strip as a field note — pulled from
@@ -68,7 +69,19 @@ async function fillPlates(token, lat, lng){
   box.innerHTML = renderPlates(ground.images);
 }
 
-// Sepia plates, the way an atlas would bind them in.
+// The seeded entries are written prose, not fetched records. That is a
+// different kind of claim from a Wikipedia extract, and it should carry its
+// reading list rather than borrow the authority of the layers around it.
+function renderSources(sources){
+  if (!sources?.length) return '';
+  return `<div class="d-sources"><h4>Sources</h4><ul>` +
+    sources.map(s => `<li>${s.url
+      ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${s.text}</a>`
+      : s.text}</li>`).join('') +
+    `</ul><p>Written for this atlas from the works above. Summary and framing are
+      the author's; errors are too. Not peer-reviewed.</p></div>`;
+}
+
 // A Pleiades record. Everything here is attributable: the gazetteer entry
 // itself is a citable URI, and where Pleiades carries a Barrington Atlas
 // reference we print it rather than hiding it behind prose.
@@ -104,6 +117,7 @@ export function showAncient(p, stop){
   fillPlates(token, p.lngLat[1], p.lngLat[0]);
 }
 
+// Sepia plates, the way an atlas would bind them in.
 function renderPlates(images){
   const shown = images.slice(0, 4);
   if (!shown.length) return '';
@@ -121,7 +135,7 @@ function renderPlates(images){
 
 // ---------------------------------------------------------------- field note
 
-export function showFieldNote({ lngLat, polity, subjectTo, precision, physio, stop }){
+export function showFieldNote({ lngLat, polity, subjectTo, precision, physio, stop, ancient }){
   const token = ++fieldToken;
   const f = formatYear(stop.y);
   const sl = seaLevelAt(stop.y);
@@ -146,6 +160,9 @@ export function showFieldNote({ lngLat, polity, subjectTo, precision, physio, st
     known.push(`<li>This is a geological stop. No boundary reconstruction exists this far back — only the sea-level estimate.</li>`);
   }
   if (physio) known.push(`<li>Physiographic region: <strong>${esc(physio)}</strong>.</li>`);
+  if (ancient)
+    known.push(`<li>Nearest attested ancient place: <a href="${pleiadesUrl(ancient.id)}"
+      target="_blank" rel="noopener">${esc(ancient.text)}</a> — ${esc(formatSpan(ancient.from, ancient.to))}.</li>`);
   known.push(`<li>Relative sea level: <strong>${sl >= 0 ? '+' : ''}${sl.toFixed(0)} m</strong> against today.</li>`);
   known.push(`<li>Period: ${esc(period)}.</li>`);
 
@@ -178,7 +195,8 @@ Say plainly where the evidence is thin.`;
 
   open();
   fillRecord(token, { lat, lng, year: stop.y, eraLabel: stop.label,
-                      polity, subjectTo, precision, physio, seaLevel: sl, period });
+                      polity, subjectTo, precision, physio, seaLevel: sl, period,
+                      ancient });
 }
 
 async function fillRecord(token, ctx){
@@ -204,7 +222,7 @@ async function fillRecord(token, ctx){
   if (!aiBox) return;
   const cached = cachedDossier(ctx.lat, ctx.lng, ctx.year);
   if (cached){
-    renderAI(aiBox, cached.html, cached.model, true);
+    renderAI(aiBox, cached.html, cached.model, true, cached.sources);
   } else if (hasKey()){
     aiBox.innerHTML =
       `<button class="gbtn ai" id="fn-write">Write the era dossier &rarr;</button>`;
@@ -215,14 +233,15 @@ async function fillRecord(token, ctx){
 async function runNarrate(token, aiBox, ctx, ground){
   aiBox.innerHTML = `<p class="stub">Writing — grounded in the lookup above…</p>`;
   try {
-    const { html, model, cached } = await narrateDossier({
+    const { html, model, cached, sources } = await narrateDossier({
       title: (ground.primary?.title) || ctx.polity || null,
       lat: ctx.lat, lng: ctx.lng, year: ctx.year, eraLabel: ctx.eraLabel,
       polity: ctx.polity, subjectTo: ctx.subjectTo, precision: ctx.precision,
-      physio: ctx.physio, seaLevel: ctx.seaLevel, period: ctx.period, ground,
+      physio: ctx.physio, seaLevel: ctx.seaLevel, period: ctx.period,
+      ground, ancient: ctx.ancient || null,
     });
     if (token !== fieldToken) return;
-    renderAI(aiBox, html, model, cached);
+    renderAI(aiBox, html, model, cached, sources);
   } catch (e){
     if (token !== fieldToken) return;
     aiBox.innerHTML = `<p class="caution">${esc(e.message || 'The dossier could not be written.')}</p>
@@ -231,10 +250,23 @@ async function runNarrate(token, aiBox, ctx, ground){
   }
 }
 
-function renderAI(box, html, model, cached){
+// The output is never shown without its audit trail: exactly which records the
+// model was given, each one a link the reader can open and check. Claims the
+// model marked as general background are visually distinguished too, so
+// "context" and "evidence about this place" never blur together.
+function renderAI(box, html, model, cached, sources){
+  const trail = (sources || []).length
+    ? `<div class="ai-src"><b>Written from</b><ul>` +
+      sources.map(s => `<li>${esc(s.kind)}: ` +
+        (s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`
+               : esc(s.label)) + `</li>`).join('') +
+      `</ul><p>Nothing outside these records was available to the model. Shaded
+       text is general period background, not evidence about this place.</p></div>`
+    : `<div class="ai-src"><p>No external records were found for this
+       coordinate — the dossier rests only on the map layers themselves.</p></div>`;
   box.innerHTML =
     `<div class="ai-mark">Written by ${esc(model)}${cached ? ' · cached' : ''} · grounded, not verified</div>
-     <div class="ai-body">${html}</div>`;
+     <div class="ai-body">${html}</div>${trail}`;
 }
 
 function renderGround(ground, here){

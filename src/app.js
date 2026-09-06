@@ -237,6 +237,9 @@ map.on('click', (e) => {
     precision: top.BORDERPRECISION ?? null,
     physio: physioAt(e.lngLat),
     stop: timeline.stop,
+    // A Pleiades record too far off to click but close enough to be relevant
+    // still belongs in the grounding for this coordinate.
+    ancient: ancient?.pick(map, e.point, timeline.stop.y, map.getZoom(), 90) || null,
   });
 });
 

@@ -180,6 +180,23 @@ body.tl-dragging,body.tl-dragging *{cursor:grabbing!important;user-select:none}
 #d-body::-webkit-scrollbar{width:9px}
 #d-body::-webkit-scrollbar-thumb{background:rgba(120,100,66,.3)}
 
+/* ---------- provenance ---------- */
+#d-body .d-sources,#d-body .ai-src{margin:22px 0 4px;padding:12px 14px;
+  border:1px solid rgba(120,100,66,.28);background:rgba(120,100,66,.07)}
+#d-body .d-sources h4,#d-body .ai-src b{display:block;margin:0 0 8px;
+  font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:#7d6742;font-weight:400}
+#d-body .d-sources ul,#d-body .ai-src ul{margin:0;padding:0;list-style:none}
+#d-body .d-sources li,#d-body .ai-src li{margin:0 0 6px;padding-left:13px;position:relative;
+  font-size:12.5px;line-height:1.5;color:#4e3f28}
+#d-body .d-sources li::before,#d-body .ai-src li::before{content:"—";position:absolute;left:0;
+  color:#a08c60}
+#d-body .d-sources p,#d-body .ai-src p{margin:9px 0 0;font-family:var(--sans);font-size:10px;
+  font-style:italic;line-height:1.6;color:#8a7350}
+/* General period background, as distinct from evidence about this place. */
+#d-body .ai-body .gen{background:rgba(140,118,74,.16);
+  box-shadow:0 0 0 1px rgba(140,118,74,.14);border-radius:2px;padding:0 2px}
+
 /* ---------- plates ---------- */
 #d-body .plates{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 18px}
 #d-body .plate{margin:0;position:relative;overflow:hidden;background:#d8c8a4;
