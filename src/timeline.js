@@ -9,6 +9,7 @@ export class Timeline {
   constructor(onChange){
     this.onChange = onChange;
     this.index = STOPS.length - 1;
+    this.labelled = [];
     this.track  = document.getElementById('tl-track');
     this.ticks  = document.getElementById('tl-ticks');
     this.handle = document.getElementById('tl-handle');
@@ -38,10 +39,12 @@ export class Timeline {
         const f = formatYear(s.y);
         y.textContent = f.n + ' ' + f.era;
         d.appendChild(y);
+        this.labelled.push(d);
       }
       frag.appendChild(d);
     });
     this.ticks.appendChild(frag);
+    this.thinLabels();
 
     // era bands along the bottom rail
     const bf = document.createDocumentFragment();
@@ -86,6 +89,14 @@ export class Timeline {
       this.handle.classList.remove('held');
     };
 
+    // The track's width changes with the window, the phone breakpoint and the
+    // panel; re-measure rather than assume the first pass still holds.
+    let thinT = 0;
+    const rethin = () => { clearTimeout(thinT); thinT = setTimeout(() => this.thinLabels(), 80); };
+    window.addEventListener('resize', rethin);
+    window.addEventListener('orientationchange', rethin);
+    if (window.ResizeObserver) new ResizeObserver(rethin).observe(this.track);
+
     this.hit.addEventListener('mousedown', down);
     this.hit.addEventListener('touchstart', down, { passive:false });
     window.addEventListener('mousemove', move);
@@ -99,6 +110,37 @@ export class Timeline {
       if (e.key === 'ArrowRight') { this.set(this.index + 1); e.preventDefault(); }
       if (e.key === 'Home')       { this.set(0); }
       if (e.key === 'End')        { this.set(STOPS.length - 1); }
+    });
+  }
+
+  // 14 year labels do not fit in a 289px track — on a phone every one of them
+  // collided. Rather than add another breakpoint guessing at widths, measure:
+  // walk the labels left to right and drop any that would touch the last one
+  // kept. Ends of the ruler are kept unconditionally, because "123,000 BCE"
+  // and "2,025 CE" are what tell you what you are looking at.
+  thinLabels(){
+    const labels = this.labelled;
+    if (!labels.length) return;
+    for (const d of labels) d.classList.remove('crowded');
+
+    const track = this.track.getBoundingClientRect();
+    if (!track.width) return;                 // laid out but not yet visible
+
+    const GAP = 6;
+    const first = labels[0], last = labels[labels.length - 1];
+    let lastRight = -Infinity;
+
+    // Reserve the right-hand end first so it always survives the walk.
+    const lastBox = last.querySelector('.yr').getBoundingClientRect();
+    const lastLeft = lastBox.left - track.left;
+
+    labels.forEach((d, i) => {
+      if (d === first){ lastRight = d.querySelector('.yr').getBoundingClientRect().right - track.left; return; }
+      if (d === last) return;
+      const b = d.querySelector('.yr').getBoundingClientRect();
+      const l = b.left - track.left, r = b.right - track.left;
+      if (l < lastRight + GAP || r > lastLeft - GAP) d.classList.add('crowded');
+      else lastRight = r;
     });
   }
 

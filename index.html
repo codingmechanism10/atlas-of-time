@@ -105,6 +105,9 @@ body.tl-dragging,body.tl-dragging *{cursor:grabbing!important;user-select:none}
 .tick.edge-l .yr{transform:translateX(calc(50% - 2px))}
 .tick.edge-r .yr{transform:translateX(calc(-50% + 2px))}
 #tl-hit{position:absolute;inset:-16px 0 -14px;z-index:3}
+/* Set by timeline.thinLabels() when a year label would collide with its
+   neighbour. Measured, so it adapts to any track width. */
+.tick.crowded .yr{display:none}
 
 /* A grip you can actually hold: brass column, knurled waist, diamond cap. */
 #tl-handle{position:absolute;top:-13px;width:14px;height:60px;z-index:4;
@@ -343,7 +346,6 @@ body.tl-dragging,body.tl-dragging *{cursor:grabbing!important;user-select:none}
   #tl-handle{width:18px;height:56px;top:-12px}
   #tl-handle .grip{height:38px}
   .tick .yr{font-size:7.5px}
-  .tick:not(.major) .yr{display:none}         /* labels collide at this width */
   #tl-bands{display:none}
   #toast{bottom:calc(var(--tl-h) + 58px);font-size:9.5px;letter-spacing:.1em}
 }
