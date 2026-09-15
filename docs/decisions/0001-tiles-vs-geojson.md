@@ -140,16 +140,54 @@ architecture fighting back.
   its source into the UI. This is the main provenance risk and needs care.
 - One-way-ish: reverting means regenerating GeoJSON. Not fatal, but not free.
 
+## Amendment, 2026-09-16 — Cloudflare Pages does not serve Range
+
+Measured against the live deployment at `atlas-of-time.pages.dev`. **Pages
+ignores `Range` entirely.** Every form returns `200` with the whole body and no
+`Accept-Ranges` header:
+
+| Asset | Request | Result |
+|---|---|---|
+| `src/app.js` | `bytes=0-511` | 200, full 18 KB |
+| `vendor/maplibre-gl.js` | `bytes=0-511` | 200, full 1.0 MB |
+| `data/base/land10.geojson` | `bytes=0-511` | 200, full 3.9 MB |
+| `range-probe.pmtiles` | `bytes=0-16383` | 200, full 182 KB |
+| `range-probe.pmtiles` | suffix `bytes=-1024` | 200, full 182 KB |
+
+Tested with a genuine PMTiles archive served as `application/octet-stream`, and
+with `Accept-Encoding: identity` to rule out compression interfering. It is not
+a content-type or a compression problem — Pages simply does not implement it.
+
+Without Range, PMTiles is strictly **worse** than whole-file GeoJSON: every tile
+lookup would pull the entire archive.
+
+**This does not change the decision, it changes where the tiles live.** The
+hybrid split still holds; the archives cannot sit in the Pages deployment.
+
+**Revised plan: PMTiles on Cloudflare R2.** R2 is S3-compatible object storage
+with native Range support, and is the documented way to serve PMTiles on
+Cloudflare. Its free tier is 10 GB with **zero egress cost**, which also
+reinforces the bandwidth argument that picked Cloudflare originally. The app
+stays on Pages; tiles are fetched cross-origin from R2.
+
+What this implies:
+- An R2 bucket with **CORS configured to allow the `Range` header** — the
+  cross-origin preflight is the next thing likely to bite.
+- Tile uploads become a deploy step separate from `git push`.
+- Stated plainly: **R2 Range support is documented but not yet measured by us.**
+  Pages advertised nothing and delivered nothing, so verify before building on it.
+
+Two traps recorded for whoever tests this next:
+- Pages returns **200 with `index.html`** for unknown paths, so "did it deploy"
+  cannot be judged by status code. Compare body size against a deliberately
+  nonsensical path. This cost a cycle here.
+- Deploys take **1–2 minutes**. A check at 15 seconds reads the fallback and
+  looks like failure.
+
 ## Still unverified
 
-Two risks remain open and must be closed before the pipeline work is trusted:
-
+- **R2 Range support, and `Range` CORS preflight.** Now the critical path.
 - **MapLibre + `pmtiles` under the globe projection.** The protocol handler is
-  well-trodden for Mercator; the globe projection is newer. This is the largest
-  remaining unknown and needs a rendering test, which the Browser pane here
-  makes awkward (it pauses the render loop).
-- **Range requests on the production host.** Cloudflare R2, S3, Netlify and
-  Vercel all advertise support, but it needs confirming on whichever we pick,
-  including CORS preflight for the `Range` header.
+  well-trodden for Mercator; the globe projection is newer.
 
-Neither blocks starting the pipeline; both block shipping it.
+Both block shipping the tile pipeline.

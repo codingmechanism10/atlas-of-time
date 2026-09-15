@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Atlas of Time</title>
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<style>
+:root{
+  --tl-h:158px;              /* timeline height; phones shrink it */
+  --sea-abyss:#14343f;
+  --sea:#1a3d49;
+  --sea-shallow:#22525f;
+  --shelf:#2d6a7a;
+  --land:#e3d2ac;
+  --land-hi:#efe2c3;
+  --land-lo:#cdb98e;
+  --ink:#2a2013;
+  --ink-soft:#5b4a31;
+  --gold:#c9a765;
+  --gold-dim:#8d7440;
+  --brass:#d9bd83;
+  --terra:#b0602c;
+  --panel:#efe3c8;
+  --panel-edge:#b39c6d;
+  --leather:#171310;
+  --leather-hi:#241d17;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:"Avenir Next","Helvetica Neue",Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--sea-abyss);
+  font-family:var(--serif);color:var(--ink);-webkit-font-smoothing:antialiased}
+#map{position:absolute;inset:0}
+.maplibregl-ctrl-attrib{font-family:var(--sans);font-size:9px;background:rgba(20,16,12,.55)!important;color:#b9a882!important}
+.maplibregl-ctrl-attrib a{color:#d3bf90!important}
+
+/* ---------- atmosphere overlays ---------- */
+#grain,#vignette{position:absolute;inset:0;pointer-events:none;z-index:2}
+#grain{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity:.16;mix-blend-mode:overlay}
+#vignette{
+  background:radial-gradient(ellipse 120% 95% at 50% 45%,rgba(0,0,0,0) 42%,rgba(10,7,4,.32) 78%,rgba(8,5,3,.66) 100%)}
+
+/* ---------- title cartouche ---------- */
+#brand{position:absolute;top:20px;left:24px;z-index:5;pointer-events:none;user-select:none}
+#brand h1{
+  margin:0;font-size:15px;letter-spacing:.42em;text-transform:uppercase;font-weight:500;
+  color:var(--brass);text-shadow:0 1px 3px rgba(0,0,0,.85)}
+#brand .rule{height:1px;margin:7px 0 6px;
+  background:linear-gradient(90deg,var(--gold),rgba(201,167,101,.15) 78%,transparent)}
+#brand p{margin:0;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(214,196,157,.62);font-family:var(--sans)}
+
+/* ---------- view mode HUD ---------- */
+#hud{position:absolute;top:22px;right:24px;z-index:5;text-align:right;
+  font-family:var(--sans);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(214,196,157,.66);text-shadow:0 1px 3px rgba(0,0,0,.8);pointer-events:none}
+#hud b{display:block;color:var(--brass);font-weight:600;font-size:11px;letter-spacing:.3em}
+#hud .coords{margin-top:6px;font-variant-numeric:tabular-nums;font-size:9.5px;opacity:.55}
+
+/* ---------- gazetteer ---------- */
+#gaz{position:absolute;left:24px;bottom:calc(var(--tl-h) + 32px);z-index:5;display:flex;flex-direction:column;gap:6px;
+  align-items:flex-start;max-height:calc(100vh - 360px);overflow-y:auto;padding-right:4px;
+  scrollbar-width:thin}
+#gaz::-webkit-scrollbar{width:5px}
+#gaz::-webkit-scrollbar-thumb{background:rgba(201,167,101,.25)}
+.gbtn{
+  font-family:var(--sans);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:#e0cfa4;background:rgba(23,19,16,.72);border:1px solid rgba(201,167,101,.28);
+  padding:7px 13px;cursor:pointer;backdrop-filter:blur(6px);transition:.16s;border-radius:1px}
+.gbtn:hover{background:rgba(45,35,24,.9);border-color:var(--gold);color:#fff3d8}
+.gbtn.wander{border-color:rgba(176,96,44,.5);color:#e8b98e}
+#gaz .lbl{font-family:var(--sans);font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(201,167,101,.5);margin-bottom:1px}
+
+/* ---------- timeline ---------- */
+#timeline{
+  position:absolute;left:0;right:0;bottom:0;height:var(--tl-h);z-index:6;
+  background:linear-gradient(180deg,rgba(12,9,7,0) 0%,rgba(14,11,8,.82) 26%,var(--leather) 62%);
+  border-top:0;padding:0 0 14px}
+#tl-head{display:flex;align-items:flex-end;gap:20px;padding:14px 26px 0}
+#tl-year{font-size:29px;line-height:1;color:var(--brass);letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;text-shadow:0 2px 6px rgba(0,0,0,.7);min-width:186px}
+#tl-year span{font-size:13px;letter-spacing:.24em;color:rgba(201,167,101,.6);margin-left:7px}
+#tl-band{font-family:var(--sans);font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(222,205,166,.78);padding-bottom:5px}
+#tl-sea{margin-left:auto;text-align:right;font-family:var(--sans);font-size:10px;
+  letter-spacing:.14em;color:rgba(222,205,166,.6);padding-bottom:3px;line-height:1.5}
+#tl-sea b{color:#8fc4d6;font-weight:600;font-variant-numeric:tabular-nums}
+#tl-sea i{display:block;font-style:normal;font-size:9px;letter-spacing:.1em;color:rgba(201,167,101,.42)}
+
+#tl-track{position:relative;height:74px;margin:8px 26px 0;cursor:grab;
+  border-top:1px solid rgba(201,167,101,.16)}
+body.tl-dragging,body.tl-dragging *{cursor:grabbing!important;user-select:none}
+#tl-ticks{position:absolute;inset:0}
+.tick{position:absolute;top:0;transform:translateX(-50%);text-align:center;pointer-events:none}
+.tick .stem{width:1px;margin:0 auto;background:rgba(201,167,101,.34)}
+.tick.major .stem{background:rgba(201,167,101,.62);width:1px}
+.tick.nodata .stem{background:rgba(143,196,214,.34)}
+.tick .yr{margin-top:5px;font-family:var(--sans);font-size:8.5px;letter-spacing:.08em;
+  color:rgba(201,167,101,.5);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tick.major .yr{color:rgba(222,205,166,.8)}
+.tick.edge-l .yr{transform:translateX(calc(50% - 2px))}
+.tick.edge-r .yr{transform:translateX(calc(-50% + 2px))}
+#tl-hit{position:absolute;inset:-16px 0 -14px;z-index:3}
+/* Set by timeline.thinLabels() when a year label would collide with its
+   neighbour. Measured, so it adapts to any track width. */
+.tick.crowded .yr{display:none}
+
+/* A grip you can actually hold: brass column, knurled waist, diamond cap. */
+#tl-handle{position:absolute;top:-13px;width:14px;height:60px;z-index:4;
+  transform:translateX(-50%);pointer-events:none;transform-origin:50% 20%}
+#tl-handle .cap{position:absolute;top:0;left:50%;width:11px;height:11px;
+  transform:translateX(-50%) rotate(45deg);
+  background:linear-gradient(135deg,#fff2d2,var(--brass) 55%,#a8894c);
+  box-shadow:0 0 13px rgba(217,189,131,.75)}
+#tl-handle .grip{position:absolute;left:0;right:0;top:9px;height:40px;border-radius:2px;
+  background:linear-gradient(180deg,#f2e0b6,#d9bd83 34%,#b0904f 78%,#8d7440);
+  box-shadow:0 0 16px rgba(217,189,131,.45),
+             inset 0 0 0 1px rgba(255,246,222,.45),
+             0 2px 5px rgba(0,0,0,.55)}
+#tl-handle .grip::after{content:"";position:absolute;left:3.5px;right:3.5px;top:12px;height:16px;
+  background:repeating-linear-gradient(180deg,
+    rgba(72,52,22,.5) 0 1px, rgba(255,244,216,.28) 1px 2px, transparent 2px 4px)}
+#tl-handle .stem{position:absolute;left:50%;top:50px;width:1px;height:26px;transform:translateX(-50%);
+  background:linear-gradient(180deg,rgba(217,189,131,.85),rgba(217,189,131,0))}
+#tl-handle.held .grip{box-shadow:0 0 24px rgba(240,214,152,.7),
+  inset 0 0 0 1px rgba(255,250,235,.6),0 3px 8px rgba(0,0,0,.6)}
+@keyframes tl-detent{
+  0%  {transform:translateX(-50%) scaleY(1)   scaleX(1)}
+  38% {transform:translateX(-50%) scaleY(1.14) scaleX(.9)}
+  100%{transform:translateX(-50%) scaleY(1)   scaleX(1)}
+}
+#tl-handle.tick{animation:tl-detent .17s cubic-bezier(.2,.9,.3,1.3)}
+@media (prefers-reduced-motion:reduce){ #tl-handle.tick{animation:none} }
+#tl-bands{position:absolute;left:26px;right:26px;bottom:2px;height:15px;pointer-events:none}
+.eband{position:absolute;bottom:0;font-family:var(--sans);font-size:8.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(201,167,101,.34);border-left:1px solid rgba(201,167,101,.16);
+  padding-left:6px;white-space:nowrap;overflow:hidden}
+
+/* ---------- dossier ---------- */
+#dossier{
+  position:absolute;top:0;right:0;bottom:var(--tl-h);width:404px;z-index:7;
+  background:linear-gradient(174deg,var(--panel) 0%,#e6d8ba 52%,#dccdab 100%);
+  border-left:1px solid var(--panel-edge);
+  box-shadow:-22px 0 54px rgba(0,0,0,.5);
+  transform:translateX(102%);transition:transform .42s cubic-bezier(.22,.8,.28,1);
+  display:flex;flex-direction:column}
+#dossier.open{transform:none}
+#dossier::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23p)' opacity='0.45'/></svg>");
+  opacity:.22;mix-blend-mode:multiply}
+#d-close{position:absolute;top:14px;right:16px;z-index:3;cursor:pointer;border:0;background:none;
+  font-size:19px;line-height:1;color:var(--ink-soft);padding:4px 6px}
+#d-close:hover{color:var(--terra)}
+#d-head{position:relative;z-index:2;padding:26px 30px 16px;border-bottom:1px solid rgba(120,100,66,.26)}
+#d-kicker{font-family:var(--sans);font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:8px}
+#d-title{font-size:27px;line-height:1.12;margin:0 0 6px;font-weight:500;letter-spacing:.005em}
+#d-sub{font-size:12.5px;font-style:italic;color:var(--ink-soft);margin:0}
+#d-era{margin-top:13px;display:inline-block;font-family:var(--sans);font-size:9.5px;
+  letter-spacing:.2em;text-transform:uppercase;color:#6a5433;
+  border:1px solid rgba(120,100,66,.35);padding:5px 10px}
+#d-body{position:relative;z-index:2;flex:1;overflow-y:auto;padding:20px 30px 34px;
+  font-size:13.7px;line-height:1.68;color:#3a2e1d}
+#d-body h4{font-family:var(--sans);font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gold-dim);margin:24px 0 9px;font-weight:600}
+#d-body h4:first-child{margin-top:2px}
+#d-body p{margin:0 0 12px}
+#d-body ul{margin:0 0 12px;padding-left:17px}
+#d-body li{margin-bottom:6px}
+#d-body .lede{font-size:14.6px;line-height:1.62}
+#d-body em{color:#4a3a24}
+#d-body .fact{border-left:2px solid var(--terra);padding:2px 0 2px 13px;margin:0 0 14px;
+  font-size:12.8px;color:#4b3b25}
+#d-body .caution{font-family:var(--sans);font-size:10.5px;line-height:1.6;letter-spacing:.02em;
+  color:#6a5433;background:rgba(176,96,44,.09);border:1px solid rgba(176,96,44,.22);
+  padding:10px 12px;margin:16px 0 0}
+#d-body .stub{font-family:var(--sans);font-size:11.5px;line-height:1.72;color:#5b4a31}
+#d-body code{font-family:ui-monospace,Menlo,monospace;font-size:11px;
+  background:rgba(120,100,66,.13);padding:1px 4px}
+#d-body::-webkit-scrollbar{width:9px}
+#d-body::-webkit-scrollbar-thumb{background:rgba(120,100,66,.3)}
+
+/* ---------- provenance ---------- */
+#d-body .d-sources,#d-body .ai-src{margin:22px 0 4px;padding:12px 14px;
+  border:1px solid rgba(120,100,66,.28);background:rgba(120,100,66,.07)}
+#d-body .d-sources h4,#d-body .ai-src b{display:block;margin:0 0 8px;
+  font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:#7d6742;font-weight:400}
+#d-body .d-sources ul,#d-body .ai-src ul{margin:0;padding:0;list-style:none}
+#d-body .d-sources li,#d-body .ai-src li{margin:0 0 6px;padding-left:13px;position:relative;
+  font-size:12.5px;line-height:1.5;color:#4e3f28}
+#d-body .d-sources li::before,#d-body .ai-src li::before{content:"—";position:absolute;left:0;
+  color:#a08c60}
+#d-body .d-sources p,#d-body .ai-src p{margin:9px 0 0;font-family:var(--sans);font-size:10px;
+  font-style:italic;line-height:1.6;color:#8a7350}
+/* General period background, as distinct from evidence about this place. */
+#d-body .ai-body .gen{background:rgba(140,118,74,.16);
+  box-shadow:0 0 0 1px rgba(140,118,74,.14);border-radius:2px;padding:0 2px}
+
+/* ---------- plates ---------- */
+#d-body .plates{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 18px}
+#d-body .plate{margin:0;position:relative;overflow:hidden;background:#d8c8a4;
+  border:1px solid rgba(120,100,66,.42);box-shadow:0 2px 7px rgba(60,45,20,.2)}
+#d-body .plate:first-child{grid-column:1 / -1}
+#d-body .plate a{display:block;line-height:0}
+#d-body .plate img{width:100%;height:96px;object-fit:cover;display:block;
+  filter:sepia(.32) saturate(.82) contrast(1.04);transition:filter .35s,transform .5s}
+#d-body .plate:first-child img{height:158px}
+#d-body .plate:hover img{filter:sepia(.08) saturate(1) contrast(1.02);transform:scale(1.035)}
+#d-body .plate figcaption{position:absolute;left:0;right:0;bottom:0;
+  font-family:var(--sans);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:#f4e8cc;padding:12px 7px 5px;line-height:1.35;
+  background:linear-gradient(180deg,transparent,rgba(28,20,10,.86));
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#d-body .plates-src{grid-column:1 / -1;font-family:var(--sans);font-size:9px;font-style:italic;
+  letter-spacing:.03em;color:#8a7350;margin-top:1px}
+
+/* ---------- field note ---------- */
+#d-body .fn-lead{font-size:14.2px;margin:0 0 8px}
+#d-body .fn-lead a{color:#5a4526;text-decoration:none;border-bottom:1px solid rgba(120,100,66,.4)}
+#d-body .fn-lead a:hover{color:var(--terra)}
+#d-body .fn-dist{font-family:var(--sans);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold-dim);white-space:nowrap}
+#d-body .fn-extract{font-size:12.8px;color:#463620}
+#d-body .fn-facts{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0 2px;clear:both}
+#d-body .fn-facts span{font-family:var(--sans);font-size:10px;letter-spacing:.03em;
+  border:1px solid rgba(120,100,66,.32);padding:3px 7px;color:#4b3b25}
+#d-body .fn-facts b{color:var(--gold-dim);font-weight:600;text-transform:uppercase;
+  letter-spacing:.12em;font-size:9px;margin-right:4px}
+#d-body .fn-also{font-size:11.5px;line-height:1.85;color:#5b4a31;margin:12px 0 0}
+#d-body .fn-also b{font-family:var(--sans);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold-dim);display:block;margin-bottom:3px}
+#d-body .fn-src{font-family:var(--sans);font-size:9.5px;letter-spacing:.03em;color:#8a7350;
+  margin:10px 0 0;font-style:italic}
+#d-body .fn-tools{margin:16px 0 0}
+#d-body .gbtn.ai{background:rgba(176,96,44,.08);color:#7a4a2c;border-color:rgba(176,96,44,.5)}
+#d-body .ai-mark{font-family:var(--sans);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold-dim);margin:20px 0 8px;padding-top:14px;border-top:1px solid rgba(120,100,66,.26)}
+#d-body .ai-body{font-size:13.5px;line-height:1.66}
+
+.gbtn.on{background:rgba(45,35,24,.92);border-color:var(--gold);color:#fff3d8}
+
+/* ---------- routes note ---------- */
+#routes-note{position:absolute;left:50%;transform:translateX(-50%);bottom:182px;z-index:9;
+  width:460px;max-width:calc(100% - 40px);
+  background:rgba(23,19,16,.94);border:1px solid rgba(201,167,101,.3);
+  color:#e6d6b0;font-family:var(--sans);font-size:11.5px;line-height:1.62;letter-spacing:.02em;
+  padding:12px 15px;opacity:0;transition:.3s;pointer-events:none}
+#routes-note.show{opacity:1;pointer-events:auto;cursor:pointer}
+@media (max-width:760px){ #routes-note{width:auto;left:16px;right:16px;transform:none;bottom:auto;top:120px} }
+
+/* ---------- settings ---------- */
+#settings{position:absolute;inset:0;z-index:12;background:rgba(10,7,4,.62);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+#settings[hidden]{display:none}
+.set-card{width:400px;max-width:calc(100% - 40px);background:linear-gradient(172deg,var(--panel),#e2d3b2);
+  border:1px solid var(--panel-edge);box-shadow:0 30px 70px rgba(0,0,0,.55);padding:26px 28px 22px;
+  color:#3a2e1d;font-size:12.7px;line-height:1.62}
+.set-card h3{margin:0 0 12px;font-size:19px;font-weight:500;letter-spacing:.01em}
+.set-card p{margin:0 0 12px}
+.set-card .set-note{font-family:var(--sans);font-size:10.5px;line-height:1.6;color:#6a5433}
+.set-card code{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;background:rgba(120,100,66,.14);padding:1px 4px}
+.set-card label{display:block;font-family:var(--sans);font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold-dim);margin:14px 0 5px}
+.set-card input,.set-card select{width:100%;font-family:var(--sans);font-size:12.5px;padding:8px 10px;
+  border:1px solid var(--panel-edge);background:rgba(255,251,240,.7);color:#3a2e1d}
+.set-row{display:flex;gap:8px;margin-top:16px}
+.set-status{font-family:var(--sans);font-size:10.5px;color:#6a5433;min-height:14px;margin-top:12px!important}
+.gbtn.sub{background:none;border-color:rgba(201,167,101,.22);color:rgba(224,207,164,.7);
+  font-size:9px;padding:5px 10px}
+#gaz .gbtn.sub{margin-top:4px}
+.gbtn.sub.on{color:#e8b98e;border-color:rgba(176,96,44,.5)}
+.set-card .gbtn{color:#5a4526;border-color:rgba(120,100,66,.4);background:rgba(255,251,240,.5)}
+.set-card .gbtn.sub{color:#6a5433}
+
+/* ---------- loading ---------- */
+#boot{position:absolute;inset:0;z-index:20;background:var(--sea-abyss);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  transition:opacity .7s;color:var(--brass)}
+#boot.gone{opacity:0;pointer-events:none}
+#boot .t{font-size:13px;letter-spacing:.44em;text-transform:uppercase}
+#boot .s{font-family:var(--sans);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(201,167,101,.42)}
+
+#toast{position:absolute;left:50%;bottom:180px;transform:translateX(-50%);z-index:10;
+  font-family:var(--sans);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  max-width:min(560px,calc(100% - 40px));text-align:center;line-height:1.55;
+  background:rgba(23,19,16,.92);color:#e0cfa4;border:1px solid rgba(201,167,101,.3);
+  padding:9px 16px;opacity:0;transition:.3s;pointer-events:none}
+#toast.show{opacity:1}
+
+/* ---------- phones ----------
+   The desktop layout puts a 404px panel on the right, a column of buttons on
+   the left and a 158px timeline along the bottom. On a phone that leaves no
+   map. So: the panel becomes a bottom sheet, the gazetteer becomes one
+   horizontally-scrolling strip, and the timeline loses everything that isn't
+   a thumb target. */
+@media (max-width:760px){
+  :root{--tl-h:112px}
+  #brand{top:14px;left:14px}
+  #brand h1{font-size:15px;letter-spacing:.3em}
+  #brand p,#brand .rule{display:none}
+  #hud{top:14px;right:14px}
+  #hud-coords{display:none}
+
+  /* One scrolling row, above the timeline, out of the map's way. */
+  #gaz{left:0;right:0;bottom:calc(var(--tl-h) + 8px);top:auto;
+    flex-direction:row;flex-wrap:nowrap;max-height:none;
+    overflow-x:auto;overflow-y:hidden;gap:6px;
+    padding:2px 14px 6px;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  #gaz::-webkit-scrollbar{display:none}
+  #gaz .gbtn{flex:0 0 auto;scroll-snap-align:start}
+  #gaz .gbtn.sub{order:99}
+  #gaz .lbl{display:none}
+
+  /* Bottom sheet. Slides up, not in from the side. */
+  #dossier{width:100%;left:0;right:0;top:auto;bottom:0;
+    height:min(78vh,640px);
+    border-left:0;border-top:1px solid var(--panel-edge);
+    border-radius:14px 14px 0 0;
+    box-shadow:0 -18px 48px rgba(0,0,0,.55);
+    transform:translateY(101%)}
+  #dossier.open{transform:translateY(0)}
+  /* A grabbable-looking lip, so it reads as a sheet. */
+  #dossier::before{content:"";position:absolute;top:7px;left:50%;width:38px;height:4px;
+    margin-left:-19px;border-radius:2px;background:rgba(90,70,40,.32)}
+  #d-head{padding-top:20px}
+  #d-close{top:12px;right:12px;width:34px;height:34px;font-size:20px}
+  #d-body{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  #d-body .plates{grid-template-columns:1fr 1fr}
+
+  /* Timeline: shorter, but the track and handle get bigger, not smaller. */
+  #timeline{height:var(--tl-h);padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+  #tl-head{gap:12px;padding:9px 14px 0}
+  #tl-year{font-size:21px;min-width:0}
+  #tl-band{font-size:9px;letter-spacing:.14em}
+  #tl-sea{margin-left:auto;text-align:right}
+  #tl-sea i{display:none}
+  #tl-track{margin:6px 18px 0;height:46px}
+  #tl-hit{inset:-22px -18px -22px -18px}      /* thumb-sized, past the ends */
+  #tl-handle{width:18px;height:56px;top:-12px}
+  #tl-handle .grip{height:38px}
+  .tick .yr{font-size:7.5px}
+  #tl-bands{display:none}
+  #toast{bottom:calc(var(--tl-h) + 58px);font-size:9.5px;letter-spacing:.1em}
+}
+
+/* Landscape phones: almost no vertical room, so give the map what there is. */
+@media (max-width:900px) and (max-height:460px){
+  :root{--tl-h:96px}
+  #brand,#tl-bands{display:none}
+  #gaz{bottom:calc(var(--tl-h) + 4px)}
+  #dossier{height:100%;width:min(380px,60%);left:auto;right:0;top:0;bottom:0;
+    border-radius:0;border-top:0;border-left:1px solid var(--panel-edge);
+    transform:translateX(102%)}
+  #dossier.open{transform:translateX(0)}
+  #dossier::before{display:none}
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="grain"></div>
+<div id="vignette"></div>
+
+<div id="brand">
+  <h1>Atlas of Time</h1>
+  <div class="rule"></div>
+  <p>Terrain &middot; Peoples &middot; Deep History</p>
+</div>
+
+<div id="hud">
+  <b id="hud-mode">Globe</b>
+  <div id="hud-hint">scroll to descend</div>
+  <div class="coords" id="hud-coords">—</div>
+</div>
+
+<div id="gaz">
+  <div class="lbl">Seeded dossiers</div>
+  <button class="gbtn" data-place="ladakh">Ladakh</button>
+  <button class="gbtn" data-place="doggerland">Doggerland</button>
+  <button class="gbtn" data-place="cappadocia">Cappadocia</button>
+  <button class="gbtn" data-place="sundaland">Sundaland</button>
+  <button class="gbtn" data-place="mesopotamia">Mesopotamia</button>
+  <button class="gbtn" data-place="great-zimbabwe">Great Zimbabwe</button>
+  <button class="gbtn" data-place="cahokia">Cahokia</button>
+  <button class="gbtn" data-place="aral">The Aral Sea</button>
+  <button class="gbtn" id="routes-toggle">Routes &amp; movement</button>
+  <button class="gbtn" id="ambience-toggle" title="Synthesised drone keyed to the region — not recordings">Ambience</button>
+  <button class="gbtn wander" id="wander">Wander &rarr;</button>
+  <button class="gbtn sub" id="settings-btn">Set API key ·</button>
+</div>
+
+<div id="settings" hidden>
+  <div class="set-card">
+    <h3>Live dossiers</h3>
+    <p>Every click already runs a keyless Wikipedia&nbsp;+&nbsp;Wikidata lookup. Add an
+    Anthropic API key and the field note will also offer a model-written dossier for the
+    selected era, grounded in that lookup.</p>
+    <p class="set-note">The key is stored in this browser only (<code>localStorage</code>) and
+    is sent nowhere but <code>api.anthropic.com</code>, directly from the page.</p>
+    <label for="set-key">Anthropic API key</label>
+    <input id="set-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+    <label for="set-model">Model</label>
+    <select id="set-model"></select>
+    <div class="set-row">
+      <button class="gbtn" id="set-save">Save</button>
+      <button class="gbtn sub" id="set-clear">Clear key</button>
+    </div>
+    <p class="set-status" id="set-status"></p>
+    <p class="set-note">Get a key at <code>console.anthropic.com</code>. Usage is billed to that account.</p>
+  </div>
+</div>
+
+<div id="timeline">
+  <div id="tl-head">
+    <div id="tl-year">—</div>
+    <div id="tl-band">—</div>
+    <div id="tl-sea">
+      <b id="tl-sea-val">—</b>
+      <i id="tl-sea-note">relative sea level</i>
+    </div>
+  </div>
+  <div id="tl-track">
+    <div id="tl-ticks"></div>
+    <div id="tl-handle"><i class="cap"></i><i class="grip"></i><i class="stem"></i></div>
+    <div id="tl-hit"></div>
+  </div>
+  <div id="tl-bands"></div>
+</div>
+
+<aside id="dossier">
+  <button id="d-close" title="Close">&times;</button>
+  <div id="d-head">
+    <div id="d-kicker">Dossier</div>
+    <h2 id="d-title">—</h2>
+    <p id="d-sub">—</p>
+    <div id="d-era">—</div>
+  </div>
+  <div id="d-body"></div>
+</aside>
+
+<div id="toast"></div>
+
+<div id="boot">
+  <div class="t">Atlas of Time</div>
+  <div class="s" id="boot-status">assembling the world</div>
+</div>
+
+<script src="vendor/maplibre-gl.js"></script>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
