@@ -10,6 +10,11 @@ bug and isn't.
 
 So: code and markup always revalidate, data is allowed to sit in the cache,
 and everything is served with the encoding and MIME type the browser needs.
+
+It also answers HTTP Range requests, which the stock handler does not. PMTiles
+archives are read by fetching byte ranges out of a single large file; without
+206 support a client silently pulls the whole archive on every tile lookup,
+which defeats the entire point of the format.
 """
 import argparse
 import functools
@@ -34,9 +39,56 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".css": "text/css",
         ".svg": "image/svg+xml",
         ".webmanifest": "application/manifest+json",
+        ".pmtiles": "application/octet-stream",
     }
 
+    def send_head(self):
+        """Serve a byte range when asked, so PMTiles archives work."""
+        rng = self.headers.get("Range")
+        if not rng or not rng.startswith("bytes="):
+            return super().send_head()
+
+        path = self.translate_path(self.path)
+        if os.path.isdir(path):
+            return super().send_head()
+        try:
+            size = os.path.getsize(path)
+            f = open(path, "rb")
+        except OSError:
+            self.send_error(404, "File not found")
+            return None
+
+        try:
+            first, _, last = rng[6:].partition("-")
+            if first:
+                start = int(first)
+                end = int(last) if last else size - 1
+            else:
+                # A suffix range: the last N bytes. PMTiles uses these.
+                start, end = max(0, size - int(last)), size - 1
+        except ValueError:
+            f.close()
+            self.send_error(400, "Malformed Range header")
+            return None
+
+        if start >= size or start > end:
+            f.close()
+            self.send_response(416)
+            self.send_header("Content-Range", f"bytes */{size}")
+            self.end_headers()
+            return None
+
+        end = min(end, size - 1)
+        f.seek(start)
+        self.send_response(206)
+        self.send_header("Content-Type", self.guess_type(path))
+        self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        self.send_header("Content-Length", str(end - start + 1))
+        self.end_headers()
+        return _Ranged(f, end - start + 1)
+
     def end_headers(self):
+        self.send_header("Accept-Ranges", "bytes")
         path = self.path.split("?", 1)[0]
         if any(path.startswith(p) for p in CACHEABLE):
             self.send_header("Cache-Control", f"public, max-age={ONE_DAY}")
@@ -49,6 +101,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # One line per request is enough; skip the 200s for static noise.
         if args and str(args[1]).startswith(("4", "5")):
             super().log_message(fmt, *args)
+
+
+class _Ranged:
+    """Reads at most `remaining` bytes, so copyfile stops at the range end."""
+
+    def __init__(self, fh, remaining):
+        self.fh, self.remaining = fh, remaining
+
+    def read(self, n=-1):
+        if self.remaining <= 0:
+            return b""
+        if n is None or n < 0:
+            n = self.remaining
+        data = self.fh.read(min(n, self.remaining))
+        self.remaining -= len(data)
+        return data
+
+    def close(self):
+        self.fh.close()
 
 
 def main():

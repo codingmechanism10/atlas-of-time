@@ -11,16 +11,20 @@ remarkable, but a stranger bouncing on mobile never reaches them.
 
 ---
 
-## M0 — Decide *(blocks everything below)* · S
+## M0 — Decide *(blocks everything below)* · S — **DONE 2026-09-15**
 
-- [ ] **ADR 0001** — tiles vs GeoJSON. Spike first: build a PMTiles archive of
-      our own layers, confirm MapLibre + Range requests work under the globe
-      projection, confirm the host serves Range without CORS trouble.
-- [ ] **ADR 0002** — monetisation. Recommendation is free + instrumented.
-- [ ] Music direction (deferred by Nippun).
+- [x] **ADR 0001** — accepted: hybrid. Tiles for static reference geography,
+      GeoJSON for time-varying data. Spiked with a real archive: 48× less data
+      to view one region at z6. Pure-Python pipeline confirmed viable with no
+      brew/node/tippecanoe. Range support added to `serve.py`, which did not
+      have it.
+- [x] **ADR 0002** — accepted by Nippun: free and instrumented.
+- [ ] Music direction — **deferred by Nippun** until the world functions the
+      way we want it to. Not blocking; moved to M5.
 
-**Done when:** both ADRs are accepted or rewritten, and the PMTiles spike has
-real numbers rather than my estimates.
+Two risks remain open from the spike and are carried into M3: MapLibre +
+`pmtiles` under the *globe* projection is unproven, and production-host Range
+support needs confirming on whichever host M1 picks.
 
 ---
 
@@ -30,7 +34,9 @@ Get it public and start learning. Deliberately *before* the big features, so
 the baseline exists.
 
 - [ ] Choose a host and deploy. Verify the cache headers survive the move —
-      module filenames never change, so code must revalidate.
+      module filenames never change, so code must revalidate. **Also verify
+      HTTP Range support and `Range` CORS preflight**, which ADR 0001 now
+      depends on.
 - [ ] Privacy-respecting analytics: day-7 return, session length, interactions
       per session, mobile share and bounce, deep-time engagement.
 - [ ] Error reporting, so failures in the wild are visible.
@@ -67,6 +73,9 @@ has never seen it can explain what it does after thirty seconds.
 
 The "works like Google Maps" ask. Shape depends entirely on ADR 0001.
 
+- [ ] **Build the tile pipeline** (`tools/`), folding in the existing Natural
+      Earth and Pleiades converters. Close the two open risks from ADR 0001
+      first: globe-projection rendering, and host Range support.
 - [ ] **geoBoundaries ADM1 + ADM2** (CC BY) — ~50,000 districts worldwide.
       The single biggest clickability jump available.
 - [ ] **GeoNames settlements** (CC BY) — filtered to >5,000 population,

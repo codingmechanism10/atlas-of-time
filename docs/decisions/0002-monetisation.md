@@ -1,6 +1,6 @@
 # ADR 0002 — Monetisation
 
-*Status: **proposed**, awaiting Nippun. Date: 2026-09-15.*
+*Status: **accepted** by Nippun, 2026-09-15.*
 
 ## The question
 
@@ -37,7 +37,8 @@ pay to see your work. A paywall on the portfolio link defeats the link.
 
 ## Decision
 
-**Free, public and instrumented, for at least two quarters.**
+**Free, public and instrumented, for at least two quarters.** Accepted by
+Nippun, who added: a high bar of craft is the point, not monetisation.
 
 Revisit only when there is retention data to price against. If day-7 return is
 weak, no price works and the answer is to improve the product, not to charge

@@ -1,6 +1,7 @@
 # ADR 0001 — Static GeoJSON vs vector tiles
 
-*Status: **proposed**, awaiting Nippun. Date: 2026-09-15.*
+*Status: **accepted**. Decided by Claude as engineering lead, 2026-09-15,
+under Nippun's standing delegation of engineering direction.*
 
 ## The question
 
@@ -71,9 +72,50 @@ Split on whether the data varies with the timeline.
   time-varying, needs whole-dataset era filtering in JS, and carries the
   provenance metadata that makes this project what it is.
 
+## Spike results
+
+Before deciding, I built a real PMTiles archive from our own `admin1` layer and
+measured it. Three findings, all of which changed my confidence.
+
+**1. The standard toolchain is unavailable here — and it does not matter.**
+No brew, no node, no tippecanoe, no GDAL on this machine. But `shapely`,
+`mapbox-vector-tile` and `pmtiles` all install from pip into a venv, and a
+~140-line pure-Python tiler produced a valid archive. The pipeline has no
+system dependencies we cannot satisfy.
+
+    admin1.geojson  4,149 features  →  3,173 tiles, z0–6, 2,143 KB archive
+    (reads back cleanly; 2,342 deduplicated entries)
+
+**2. The archive is bigger in total, and that is irrelevant.** 2,143 KB against
+683 KB gzipped for the whole file, because tiles repeat geometry across zooms.
+Nobody ever fetches it all. The number that matters is bytes per viewport:
+
+| Region (3×4 tiles) | z4 | z6 |
+|---|---|---|
+| Greece / Aegean | 111.9 KB | **19.9 KB** |
+| Rhineland | 120.5 KB | **28.9 KB** |
+| Bay of Bengal | 45.8 KB | **9.8 KB** |
+| US Midwest | 38.7 KB | **5.9 KB** |
+| Sahara (sparse) | 117.5 KB | **7.2 KB** |
+| **mean** | **86.9 KB** | **14.3 KB** |
+
+Against 683 KB fetched in full, every time: **roughly 48× less data to look at
+one place at z6**, 8× at z4. And it degrades gracefully — sparse regions cost
+almost nothing, which whole-file GeoJSON cannot do.
+
+Caveat: my tiler is naive next to tippecanoe — no feature dropping, no proper
+generalisation. Real tooling would likely do better, so treat these as a floor.
+
+**3. Range requests were broken on our own server.** `SimpleHTTPRequestHandler`
+ignores `Range` and returns 200 with the entire body, which would have made
+PMTiles *worse* than GeoJSON — a full 2.1 MB download per tile lookup. Fixed in
+`serve.py` (206, `Content-Range`, suffix ranges, `Accept-Ranges`), verified.
+This is exactly the kind of thing that would have been discovered late and
+blamed on the format.
+
 ## Decision
 
-**Recommend C, the hybrid.**
+**Accepted: C, the hybrid.**
 
 It is the only option that reaches the fidelity goal and fixes mobile, while
 keeping the parts of the architecture that are genuinely load-bearing. The
@@ -98,14 +140,16 @@ architecture fighting back.
   its source into the UI. This is the main provenance risk and needs care.
 - One-way-ish: reverting means regenerating GeoJSON. Not fatal, but not free.
 
-## Not yet verified
+## Still unverified
 
-Before committing, confirm with real numbers rather than estimates:
+Two risks remain open and must be closed before the pipeline work is trusted:
 
-- Size of a self-built PMTiles archive for *our* layers only (not the full
-  Protomaps planet basemap, which is far larger than we need).
-- That MapLibre + `pmtiles` handles Range requests correctly under the globe
-  projection.
-- Whether the chosen host serves Range requests without a CORS problem.
+- **MapLibre + `pmtiles` under the globe projection.** The protocol handler is
+  well-trodden for Mercator; the globe projection is newer. This is the largest
+  remaining unknown and needs a rendering test, which the Browser pane here
+  makes awkward (it pauses the render loop).
+- **Range requests on the production host.** Cloudflare R2, S3, Netlify and
+  Vercel all advertise support, but it needs confirming on whichever we pick,
+  including CORS preflight for the `Range` header.
 
-These are a day of spiking, and should happen before the pipeline work starts.
+Neither blocks starting the pipeline; both block shipping it.
