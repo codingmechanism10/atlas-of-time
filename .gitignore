@@ -2,3 +2,7 @@ node_modules/
 .DS_Store
 data/cache/
 .atlas-key
+
+# Claude Code machine-local settings: permission grants and session-specific
+# scratchpad paths. Never shared.
+.claude/settings.local.json
