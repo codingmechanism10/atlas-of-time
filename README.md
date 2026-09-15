@@ -242,10 +242,31 @@ What's left from the original list:
 
 ---
 
+## Licence
+
+The **code** is MIT — see `LICENSE`.
+
+The **data is not**. Everything under `data/` is redistributed from upstream
+projects that carry their own terms, and the MIT licence does not and cannot
+relicense them. If you reuse this, you inherit their obligations, not ours:
+
+| Source | Covers | Licence |
+|---|---|---|
+| [Pleiades](https://pleiades.stoa.org) | `data/ancient/` — 32,878 ancient places | **CC BY 3.0** — attribution required |
+| [Natural Earth](https://www.naturalearthdata.com) | `data/base/`, `world_2025.geojson` | Public domain |
+| [aourednik/historical-basemaps](https://github.com/aourednik/historical-basemaps) | `data/eras/` — 53 boundary snapshots | See upstream repository |
+| [MapLibre GL JS](https://maplibre.org) | `vendor/` | BSD-3-Clause |
+
+Fetched live at runtime, never redistributed here: Wikipedia and Wikidata
+(CC BY-SA / CC0) for dossier text and imagery, and Mapzen / AWS Terrain Tiles
+for relief. Attribution for those is surfaced in the UI, which is a design
+principle of this project rather than a footnote — see `CLAUDE.md`.
+
 ## Data and credits
 
 - Historical boundaries — [aourednik/historical-basemaps](https://github.com/aourednik/historical-basemaps); present-day borders from [Natural Earth](https://www.naturalearthdata.com) 110 m admin-0
 - Coastlines, lakes, rivers, physiography, bathymetry — [Natural Earth](https://www.naturalearthdata.com) (public domain)
+- Ancient places — [Pleiades](https://pleiades.stoa.org), CC BY 3.0
 - Relief — Mapzen / AWS Terrain Tiles
 - Rendering — [MapLibre GL JS](https://maplibre.org) 5.24 (vendored in `vendor/`)
 
