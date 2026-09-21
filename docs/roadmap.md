@@ -59,6 +59,35 @@ The highest-leverage milestone and the one most likely to be underestimated.
 - [ ] **Mobile interaction design.** Touch targets, the timeline under a
       thumb, tapping labels, the bottom sheet. The CSS exists; the interaction
       design does not.
+
+      **The timeline slider is the known failure.** Measured at a 375px
+      viewport: 58 stops across a 339px track is a **4.6px median gap**
+      (tightest 3.8px, between 1492 and 1500). A fingertip contact patch is
+      40–45px, so **one thumb press covers ~8 stops** — you land within ±4 of
+      what you aimed at and cannot select 1492 at all. Not fixable with a
+      bigger handle; the target itself is 4px.
+
+      Root cause: the timeline is doing two jobs. It is an *overview* (all of
+      time at a glance, which is a real strength on desktop) and a *precise
+      control*. A mouse is pixel-accurate so desktop gets away with it; a
+      thumb does not.
+
+      Options considered — (a) **scroll-ruler**: horizontally scrollable on
+      phone, ~44px per stop, fixed centre marker, CSS `scroll-snap`, existing
+      detents fire on each snap; the camera-mode-selector pattern, needs no
+      explanation. Cost: loses "all of time at a glance" on phone. (b)
+      **stepper arrows** for guaranteed single-stop precision — cheap
+      insurance, composes with anything. (c) **drag-down-to-refine**,
+      sensitivity scaling with vertical distance; elegant, keeps the overview,
+      but undiscoverable.
+
+      Engineering recommendation is (a) + (b), but the overview/controllability
+      trade is Nippun's design call. Proposed next step: build the scroll-ruler
+      behind a flag and compare both on a real phone.
+
+      Nippun's other phone feedback, 2026-09-16: map scroll/zoom and angle
+      control feel good — that is MapLibre's touch handling, and it must not
+      regress when the timeline gesture changes.
 - [ ] **Mobile performance.** Depends on ADR 0001. Currently the deep-zoom
       tier is 4.4 MB gzipped and fetches the whole planet to look at one place.
 - [ ] PWA: installable, offline shell, home-screen icon.
